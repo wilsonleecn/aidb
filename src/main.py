@@ -3,6 +3,7 @@
 
 from openai_sql import generate_sql_from_question
 from db_runner import run_sql_from_config
+from result_summarizer import summarize_sql_result
 
 def main():
     """
@@ -23,6 +24,10 @@ def main():
 
     # 4. Print the query results
     print("\nQuery Results:\n", results)
+    
+    # 3. Summarize in a human-readable way
+    summary = summarize_sql_result(user_question, sql_query, results)
+    print("\nSummary:\n", summary)
 
 if __name__ == "__main__":
     main()
