@@ -73,8 +73,8 @@ CREATE TABLE ServerGroupMapping (
 );
 """
 
-SYSTEM_PROMPT = """
-You are an AI assistant that generates SQL queries based on the following schema.
+SYSTEM_PROMPT_BASE = """
+You are an AI assistant that generates SQL queries based on the following schema and helper info.
 Use only the information in the schema to answer questions.
 Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
