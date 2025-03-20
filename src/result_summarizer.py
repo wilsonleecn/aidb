@@ -45,11 +45,6 @@ def summarize_sql_result(user_question: str, sql_query: str, query_result) -> st
         }
     ]
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT + "\n" + DB_SCHEMA_PROMPT},
-        {"role": "user", "content": user_question}
-    ]
-
     # Make the request to OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
