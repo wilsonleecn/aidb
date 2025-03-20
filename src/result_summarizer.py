@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import openai
+from openai import OpenAI
 
 # Set your OpenAI API key:
 openai.api_key = os.getenv("OPENAI_API_KEY")  # or hardcode, but not recommended
@@ -45,13 +45,19 @@ def summarize_sql_result(user_question: str, sql_query: str, query_result) -> st
         }
     ]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # or gpt-4, depending on availability
-        messages=messages,
-        temperature=0.7,
-        max_tokens=400
-    )
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT + "\n" + DB_SCHEMA_PROMPT},
+        {"role": "user", "content": user_question}
+    ]
 
+    # Make the request to OpenAI
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0.2,
+        max_tokens=300)
+
+    # Extract and print the assistant's answer (human readable answer)
     summary_text = response["choices"][0]["message"]["content"].strip()
     return summary_text
 
