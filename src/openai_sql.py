@@ -98,8 +98,24 @@ def generate_sql_from_question(user_question: str) -> str:
     messages=messages,
     temperature=0.2,
     max_tokens=300)
-    
+
     # Extract and print the assistant's answer (SQL statement)
     sql_answer = response.choices[0].message.content
+    sql_answer = parse_sql_code_block(sql_answer)
     print("\nGenerated SQL Query:\n")
     print(sql_answer)
+
+def parse_sql_code_block(text: str) -> str:
+    """
+    Parses out the first ```sql ... ``` code block from the text and returns the SQL code without the backticks.
+    If no code block is found, returns the original text stripped.
+    """
+    # Regex to capture text within ```sql ... ```
+    pattern = r"```sql\s*(.*?)\s*```"
+    match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+    if match:
+        # Return only the code inside the code fence
+        return match.group(1).strip()
+    else:
+        # If no match, just return the text stripped
+        return text.strip()
