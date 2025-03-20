@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#docker build . -t ai:latest
+#docker run -v /home/work/operationtool/resource_searcher/openai_request.py:/tmp/openai_request.py -v /home/work/operationtool/resource_searcher/db:/tmp/db --rm -ti ai:latest bash
+#python db_runner.py "SELECT * FROM Domain LIMIT 5;" "db_config.ini"
 
 import os
-import openai
+from openai import OpenAI
 
-# Ensure your OPENAI_API_KEY is set in the environment or replace with direct string:
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Prepare the database schema prompt you want the AI to know:
 DB_SCHEMA_PROMPT = """
@@ -92,13 +93,13 @@ def generate_sql_from_question(user_question: str) -> str:
         {"role": "user", "content": user_question}
     ]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=0.2,
-        max_tokens=300
-    )
-
-    # We assume the entire assistant message is the SQL
-    sql_answer = response.choices[0].message.content.strip()
-    return sql_answer
+    # Make the request to OpenAI
+    response = client.chat.completions.create(model="gpt-4o",
+    messages=messages,
+    temperature=0.2,
+    max_tokens=300)
+    
+    # Extract and print the assistant's answer (SQL statement)
+    sql_answer = response.choices[0].message.content
+    print("\nGenerated SQL Query:\n")
+    print(sql_answer)
