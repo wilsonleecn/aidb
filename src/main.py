@@ -13,7 +13,7 @@ def main():
     config_path = "db_config.ini"  # Adjust path if needed
 
     # 1. Call OpenAI to generate SQL
-    sql_query = generate_sql_from_question(user_question)
+    sql_query = generate_sql_from_question(user_question, config_path)
 
     # 2. Print the generated SQL
     print("\nGenerated SQL Query:\n")

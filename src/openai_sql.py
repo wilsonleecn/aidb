@@ -80,7 +80,7 @@ Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
 """
 
-def generate_sql_from_question(user_question: str) -> str:
+def generate_sql_from_question(user_question: str, config_path: str) -> str:
     """
     1) Calls get_metadata to fetch domain/server group/service names from DB.
     2) Builds a system prompt that includes both the DB schema and the actual metadata.
