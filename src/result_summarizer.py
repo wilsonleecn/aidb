@@ -53,7 +53,7 @@ def summarize_sql_result(user_question: str, sql_query: str, query_result) -> st
         max_tokens=300)
 
     # Extract and print the assistant's answer (human readable answer)
-    summary_text = response["choices"][0]["message"]["content"].strip()
+    summary_text = response.choices[0].message.content.strip()
     return summary_text
 
 def main():
