@@ -5,6 +5,7 @@
 
 import os
 import re
+from metadata_helper import get_metadata
 from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -81,16 +82,24 @@ Do not provide explanations—only the SQL.
 
 def generate_sql_from_question(user_question: str) -> str:
     """
-    Calls OpenAI to generate SQL from a user question using the schema in DB_SCHEMA_PROMPT.
+    1) Calls get_metadata to fetch domain/server group/service names from DB.
+    2) Builds a system prompt that includes both the DB schema and the actual metadata.
+    3) Calls OpenAI to generate SQL from the user question.
 
     Args:
         user_question (str): Natural language question from the user.
+        config_path (str): Path to the DB config file for fetching metadata (e.g., 'db_config.ini').
 
     Returns:
         str: The SQL query (as a string).
     """
+    # Get actual domain/servergroup/service names from the DB:
+    helper_info = get_metadata(config_path)
+    # Combine the schema and the dynamic helper info in the system prompt
+    system_prompt = SYSTEM_PROMPT_BASE + "\n\n" + DB_SCHEMA_PROMPT + "\n\n" + helper_info
+
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT + "\n" + DB_SCHEMA_PROMPT},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_question}
     ]
 
