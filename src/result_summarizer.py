@@ -5,7 +5,7 @@ import os
 from openai import OpenAI
 
 # Set your OpenAI API key:
-openai.api_key = os.getenv("OPENAI_API_KEY")  # or hardcode, but not recommended
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def summarize_sql_result(user_question: str, sql_query: str, query_result) -> str:
     """
@@ -51,7 +51,7 @@ def summarize_sql_result(user_question: str, sql_query: str, query_result) -> st
     ]
 
     # Make the request to OpenAI
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=0.2,
