@@ -5,8 +5,9 @@
 
 import os
 import re
-from metadata_helper import get_metadata
 from openai import OpenAI
+from metadata_helper import get_metadata
+from db_runner import run_sql_from_config
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -80,7 +81,7 @@ Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
 """
 
-def generate_sql_from_question(user_question: str, config_path: str) -> str:
+def generate_statements_from_question(user_question: str, config_path: str) -> list:
     """
     1) Calls get_metadata to fetch domain/server group/service names from DB.
     2) Builds a system prompt that includes both the DB schema and the actual metadata.
@@ -112,6 +113,7 @@ def generate_sql_from_question(user_question: str, config_path: str) -> str:
     # Extract and print the assistant's answer (SQL statement)
     sql_answer = response.choices[0].message.content
     sql_answer = parse_sql_code_block(sql_answer)
+
     return sql_answer
 
 def parse_sql_code_block(text: str) -> str:
@@ -128,3 +130,44 @@ def parse_sql_code_block(text: str) -> str:
     else:
         # If no match, just return the text stripped
         return text.strip()
+
+def parse_multiple_queries(sql_answer: str) -> list:
+    """
+    Splits an OpenAI-generated SQL response into separate statements.
+    We assume statements are separated by a semicolon or a blank line.
+    
+    Returns a list of SQL statements (strings).
+    """
+    # 1) Split on semicolons. This is simplistic—works for basic SQL.
+    # 2) Trim whitespace. 
+    statements = []
+    for part in sql_answer.split(";"):
+        stmt = part.strip()
+        # If it still contains newlines, we can remove them or keep them, doesn't matter for simple queries
+        # but let's keep them just in case.
+        if stmt:
+            statements.append(stmt)
+    return statements
+
+def execute_multiple_queries(sqls: str, config_path: str) -> list:
+    """
+    Parses the SQL answer into individual statements,
+    executes each, and collects results.
+    
+    Returns a list of dictionaries, each containing the query and the result.
+    """
+    statements = parse_multiple_queries(sqls)
+    results_list = []
+    
+    #Print the generated SQL
+    print("\nGenerated SQL Query:\n")
+    for stmt in statements:
+        print(stmt)
+
+    #Execute statements and collect the results
+    for stmt in statements:
+        # run_sql_from_config returns a list of dicts
+        query_result = run_sql_from_config(stmt, config_path)
+        results_list.append({"query": stmt, "result": query_result})
+    
+    return results_list
