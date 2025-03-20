@@ -4,6 +4,7 @@
 #python db_runner.py "SELECT * FROM Domain LIMIT 5;" "db_config.ini"
 
 import os
+import re
 from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
