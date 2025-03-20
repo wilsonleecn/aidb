@@ -103,8 +103,7 @@ def generate_sql_from_question(user_question: str) -> str:
     # Extract and print the assistant's answer (SQL statement)
     sql_answer = response.choices[0].message.content
     sql_answer = parse_sql_code_block(sql_answer)
-    print("\nGenerated SQL Query:\n")
-    print(sql_answer)
+    return sql_answer
 
 def parse_sql_code_block(text: str) -> str:
     """
