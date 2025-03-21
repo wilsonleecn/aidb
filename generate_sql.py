@@ -25,17 +25,13 @@ def get_domain_name_aliases(domain_name: str) -> list:
     #       - "DE"
     #       - "Dev QA Europe"
     resource_list = data.get("resourcealias", [])
-    print(resource_list)
     if not isinstance(resource_list, list):
         return []
     aliases = []
     for item in resource_list:
-        print(item)
         if item.get("resource_type") == "domain" and item.get("name") == domain_name:
             alias_list = item.get("alias", [])
             aliases.extend(alias_list)
-    for aa in aliases:
-        print(f"{aa}")
     return aliases
 
 def escape_sql(value):
