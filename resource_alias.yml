@@ -1,52 +1,58 @@
 #25.2 AI
 resourcealias:
-  domain:
-    - name: "DevQAEurope"
-      alias:
-        - "DE"
-        - "DQEU"
-        - "DQ EU"
-        - "DQEurope"
-        - "DQ Europe"
-    - name: "DevQAGlobal"
-      alias:
-        - "DG"
-        - "DQGL"
-        - "DQ GL"
-        - "DQGlobal"
-        - "DQ Global"
-    - name: "DevQAJapan"
-      alias:
-        - "DJ"
-        - "DQJP"
-        - "DQ JP"
-        - "DQJapan"
-        - "DQ Japan"
-    - name: "DevQAUS"
-      alias:
-        - "DU"
-        - "DQUS"
-        - "DQ US"
-    - name: "RE"
-      alias:
-        - "Realse QA Europe"
-        - "Release Global"
-        - "RQEU"
-        - "RQ EU"
-    - name: "RG"
-      alias:
-        - "Realse QA Global"
-        - "Realse Global"
-        - "RQGL"
-        - "RQ GL"
-    - name: "RJ"
-      alias:
-        - "Realse QA Japan"
-        - "Realse Japan"
-        - "RQJP"
-        - "RQ JP"
+  - resource_type: "domain"
+    name: "DevQAEurope"
+    alias:
+      - "DE"
+      - "DQEU"
+      - "DQ EU"
+      - "DQEurope"
+      - "DQ Europe"
+  - resource_type: "domain"
+    name: "DevQAGlobal"
+    alias:
+      - "DG"
+      - "DQGL"
+      - "DQ GL"
+      - "DQGlobal"
+      - "DQ Global"
+  - resource_type: "domain"
+    name: "DevQAJapan"
+    alias:
+      - "DJ"
+      - "DQJP"
+      - "DQ JP"
+      - "DQJapan"
+      - "DQ Japan"
+  - resource_type: "domain"
+    name: "DevQAUS"
+    alias:
+      - "DU"
+      - "DQUS"
+      - "DQ US"
+  - resource_type: "domain"
+    name: "RE"
+    alias:
+      - "Realse QA Europe"
+      - "Release Global"
+      - "RQEU"
+      - "RQ EU"
+  - resource_type: "domain"
+    name: "RG"
+    alias:
+      - "Realse QA Global"
+      - "Realse Global"
+      - "RQGL"
+      - "RQ GL"
+  - resource_type: "domain"
+    name: "RJ"
+    alias:
+      - "Realse QA Japan"
+      - "Realse Japan"
+      - "RQJP"
+      - "RQ JP"
 
-  servergroup:
+  # servergroup:
 
-  service:
+  # service:
 
