@@ -81,19 +81,6 @@ Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
 """
 
-def build_domain_alias_prompt(domain_alias_map: dict) -> str:
-    """
-    Takes a dictionary mapping real_domain_name -> list_of_aliases.
-    Returns a textual explanation for GPT.
-    """
-    lines = []
-    lines.append("The following domains and their aliases exist:")
-    for real_name, aliases in domain_alias_map.items():
-        # aliases might be ["DE", "Dev QA Europe", "DQEU"]
-        alias_str = ", ".join(aliases)
-        lines.append(f'- Domain "{real_name}" can also be called: {alias_str}')
-    return "\n".join(lines)
-
 def generate_statements_from_question(user_question: str, config_path: str) -> list:
     """
     1) Calls get_metadata to fetch domain/server group/service names from DB.
