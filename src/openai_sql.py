@@ -6,7 +6,7 @@
 import os
 import re
 from openai import OpenAI
-from metadata_helper import get_metadata
+from aidb.src.prompt_helper import get_metadata, build_domain_alias_prompt
 from db_runner import run_sql_from_config
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -81,9 +81,23 @@ Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
 """
 
+def build_domain_alias_prompt(domain_alias_map: dict) -> str:
+    """
+    Takes a dictionary mapping real_domain_name -> list_of_aliases.
+    Returns a textual explanation for GPT.
+    """
+    lines = []
+    lines.append("The following domains and their aliases exist:")
+    for real_name, aliases in domain_alias_map.items():
+        # aliases might be ["DE", "Dev QA Europe", "DQEU"]
+        alias_str = ", ".join(aliases)
+        lines.append(f'- Domain "{real_name}" can also be called: {alias_str}')
+    return "\n".join(lines)
+
 def generate_statements_from_question(user_question: str, config_path: str) -> list:
     """
     1) Calls get_metadata to fetch domain/server group/service names from DB.
+    2) Calls build_domain_alias_prompt to fetch domain alias to generate prompt from DB.
     2) Builds a system prompt that includes both the DB schema and the actual metadata.
     3) Calls OpenAI to generate SQL from the user question.
 
@@ -95,9 +109,10 @@ def generate_statements_from_question(user_question: str, config_path: str) -> l
         str: The SQL query (as a string).
     """
     # Get actual domain/servergroup/service names from the DB:
+    domain_alias_prompt = build_domain_alias_prompt(config_path)
     helper_info = get_metadata(config_path)
     # Combine the schema and the dynamic helper info in the system prompt
-    system_prompt = SYSTEM_PROMPT_BASE + "\n\n" + DB_SCHEMA_PROMPT + "\n\n" + helper_info
+    system_prompt = SYSTEM_PROMPT_BASE + "\n\n" + DB_SCHEMA_PROMPT + "\n\n" + helper_info + "\n\n" + domain_alias_prompt
 
     messages = [
         {"role": "system", "content": system_prompt},
