@@ -6,7 +6,7 @@
 import os
 import re
 from openai import OpenAI
-from aidb.src.prompt_helper import get_metadata, build_domain_alias_prompt
+from prompt_helper import get_metadata, build_domain_alias_prompt
 from db_runner import run_sql_from_config
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
