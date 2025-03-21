@@ -51,6 +51,10 @@ resourcealias:
       - "Realse Japan"
       - "RQJP"
       - "RQ JP"
+  - resource_type: "domain"
+    name: "globalnew"
+    alias:
+      - "global"
 
   # servergroup:
 
