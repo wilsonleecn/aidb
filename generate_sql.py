@@ -1,7 +1,41 @@
 import os
 import json
+import yaml
 import re
 import sys
+
+def get_domain_name_aliases(domain_name: str) -> list:
+    """
+    Reads 'resource_alias.yml' from the current working directory (os.getcwd()),
+    finds any entry where resource_type == 'domain' and name == domain_name.
+    Returns all aliases (list of strings) for that domain, or an empty list if none found.
+    """
+    # Build a path to 'resource_alias.yml' in the current working directory
+    yaml_file = os.path.join(os.getcwd(), "resource_alias.yml")
+    if not os.path.isfile(yaml_file):
+        print(f"[WARNING] {yaml_file} not found in current working directory.")
+        return []
+
+    with open(yaml_file, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+
+    # Expected YAML format, e.g.:
+    # resourcealias:
+    #   - resource_type: "domain"
+    #     name: "dev1"
+    #     alias:
+    #       - "DE"
+    #       - "Dev QA Europe"
+    resource_list = data.get("resourcealias", [])
+    if not isinstance(resource_list, list):
+        return []
+
+    aliases = []
+    for item in resource_list:
+        if item.get("resource_type") == "domain" and item.get("name") == domain_name:
+            alias_list = item.get("alias", [])
+            aliases.extend(alias_list)
+    return aliases
 
 def escape_sql(value):
     """Escape single quotes and other special characters for SQL."""
@@ -80,12 +114,20 @@ def parse_server_mapping(file_path):
             })
     return server_groups
 
-def generate_sql(domain_name, server_hosts, service_info, server_mapping):
+def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping):
     sql_commands = []
     sql_commands.append(f"INSERT INTO Domain (id, name) VALUES (NULL, '{escape_sql(domain_name)}');")
     sql_commands.append(f"SET @domain_id = LAST_INSERT_ID();")
     sql_commands.append(f"SET @id_prefix = @domain_id * 1000;")
     
+    # Insert aliases for this domain into ResourceAlias
+    #    resource_type = 'domain', resource_id = @domain_id, alias = each item in domain_name_alias_list
+    for alias in domain_name_alias_list:
+        sql_commands.append(
+            f"INSERT INTO ResourceAlias (resource_type, resource_id, alias) "
+            f"VALUES ('domain', @domain_id, '{escape_sql(alias)}');"
+        )
+
     host_group_ids = {}
     service_ids = {}
     server_group_ids = {}
@@ -119,14 +161,17 @@ def generate_sql(domain_name, server_hosts, service_info, server_mapping):
 
 def main(folder_path):
     domain_name = os.path.basename(folder_path)
+    domain_name_alias_list = get_domain_name_aliases(domain_name)
     server_hosts = parse_server_hosts(os.path.join(folder_path, 'serverHosts'))
     service_info = parse_service_info(os.path.join(folder_path, 'serviceInfo.conf'))
     server_mapping = parse_server_mapping(os.path.join(folder_path, 'serverMapping.conf'))
-    sql_statements = generate_sql(domain_name, server_hosts, service_info, server_mapping)
+    sql_statements = generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping)
     
-    with open(os.path.join(folder_path, 'generated_sql.sql'), 'w') as f:
+    crrentPath = os.getcwd()
+    fileName =  domain_name+'_aid.sql'
+    with open(os.path.join(crrentPath, fileName), 'w') as f:
         f.write('\n'.join(sql_statements))
-    print(f"SQL script saved to {folder_path}/generated_sql.sql")
+    print(f"SQL script saved to {crrentPath}/{fileName}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
