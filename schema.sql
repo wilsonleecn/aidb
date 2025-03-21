@@ -63,3 +63,10 @@ CREATE TABLE ServerGroupMapping (
     FOREIGN KEY (server_host_group_id) REFERENCES ServerHostGroup(id) ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE
 );
+
+CREATE TABLE ResourceAlias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resource_type VARCHAR(100),           -- e.g. "domain", "service", etc.
+    resource_id BIGINT UNSIGNED NOT NULL, -- references the actual resource's ID
+    alias VARCHAR(255) NOT NULL
+);
