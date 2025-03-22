@@ -19,7 +19,7 @@ services:
 
     # Mount our init scripts
     volumes:
-      - ./initdb:/docker-entrypoint-initdb.d
+      - ./db/init:/docker-entrypoint-initdb.d
       - /data/db:/var/lib/mysql
 
   aidb:
@@ -29,4 +29,6 @@ services:
     working_dir: /home/work/aidb
     volumes:
       - ./src:/home/work/aidb
-    command: tail -f /dev/null
+    ports:
+      - "5000:5000"
+    command: python web_server.py

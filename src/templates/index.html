@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI SQL Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        #questionInput {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        #submitButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+        .help-text {
+            margin-bottom: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI SQL Assistant</h1>
+    
+    <div class="help-text">
+        <h3>How to use:</h3>
+        <ul>
+            <li>Enter your question about the database in plain English</li>
+            <li>The system will generate and execute appropriate SQL queries</li>
+            <li>You'll receive a human-readable summary of the results</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <textarea id="questionInput" rows="4" placeholder="Enter your question here..."></textarea>
+        <button id="submitButton" onclick="askQuestion()">Get Answer</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        function askQuestion() {
+            const question = document.getElementById('questionInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+
+            // Disable button while processing
+            const button = document.getElementById('submitButton');
+            button.disabled = true;
+            button.textContent = 'Processing...';
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<h3>Answer:</h3><p>${data.summary}</p>`;
+                }
+                resultDiv.style.display = 'block';
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error}</p>`;
+                resultDiv.style.display = 'block';
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.textContent = 'Get Answer';
+            });
+        }
+    </script>
+</body>
+</html> 
