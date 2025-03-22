@@ -34,6 +34,18 @@
             margin-bottom: 20px;
             color: #666;
         }
+        .result-content {
+            white-space: pre-wrap;
+            line-height: 1.5;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .result-content strong {
+            color: #2c5282;
+            display: block;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +94,17 @@
                 if (data.error) {
                     resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
                 } else {
-                    resultDiv.innerHTML = `<h3>Answer:</h3><p>${data.summary}</p>`;
+                    // Format the summary with proper HTML line breaks
+                    const formattedSummary = data.summary
+                        .replace(/\n/g, '<br>')  // Replace newlines with <br>
+                        .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')  // Replace tabs with spaces
+                        .replace(/(SQL Query:)/g, '<strong>$1</strong>')  // Bold "SQL Query:" text
+                        .replace(/(Results:)/g, '<strong>$1</strong>');   // Bold "Results:" text
+                    
+                    resultDiv.innerHTML = `
+                        <h3>Answer:</h3>
+                        <div class="result-content">${formattedSummary}</div>
+                    `;
                 }
                 resultDiv.style.display = 'block';
             })
