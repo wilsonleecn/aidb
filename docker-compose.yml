@@ -28,3 +28,4 @@ services:
     restart: always
     volumes:
       - ./src:/home/work/aidb
+    command: tail -f /dev/null
