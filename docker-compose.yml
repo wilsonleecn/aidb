@@ -24,6 +24,8 @@ services:
     container_name: aidb
     restart: always
     working_dir: /home/work/aidb
+    env_file:
+      - .env
     volumes:
       - ./src:/home/work/aidb
     ports:
