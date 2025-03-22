@@ -9,12 +9,15 @@ def index():
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    question = request.json.get('question', '')
+    data = request.json
+    question = data.get('question', '')
+    language = data.get('language', 'en')  # Get language preference
+    
     if not question:
         return jsonify({'error': 'Question is required'}), 400
     
     try:
-        result = process_question(question)
+        result = process_question(question, language)  # Pass language to process_question
         return jsonify({'summary': result})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

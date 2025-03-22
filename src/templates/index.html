@@ -46,75 +46,157 @@
             display: block;
             margin-top: 10px;
         }
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .language-btn {
+            padding: 5px 10px;
+            margin-left: 5px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .language-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
     </style>
 </head>
 <body>
-    <h1>AI SQL Assistant</h1>
+    <div class="language-selector">
+        <button class="language-btn active" onclick="switchLanguage('en')" data-lang="en">English</button>
+        <button class="language-btn" onclick="switchLanguage('zh')" data-lang="zh">中文</button>
+    </div>
+
+    <h1 data-i18n="title">AI SQL Assistant</h1>
     
     <div class="help-text">
-        <h3>How to use:</h3>
+        <h3 data-i18n="howToUseTitle">How to use:</h3>
         <ul>
-            <li>Enter your question about the database in plain English</li>
-            <li>The system will generate and execute appropriate SQL queries</li>
-            <li>You'll receive a human-readable summary of the results</li>
+            <li data-i18n="instruction1">Enter your question about the database in plain English</li>
+            <li data-i18n="instruction2">The system will generate and execute appropriate SQL queries</li>
+            <li data-i18n="instruction3">You'll receive a human-readable summary of the results</li>
         </ul>
     </div>
 
     <div class="container">
-        <textarea id="questionInput" rows="4" placeholder="Enter your question here..."></textarea>
-        <button id="submitButton" onclick="askQuestion()">Get Answer</button>
+        <textarea id="questionInput" rows="4" data-i18n-placeholder="questionPlaceholder"></textarea>
+        <button id="submitButton" onclick="askQuestion()" data-i18n="submitButton">Get Answer</button>
     </div>
 
     <div id="result"></div>
 
     <script>
+        // Language translations
+        const translations = {
+            en: {
+                title: 'AI SQL Assistant',
+                howToUseTitle: 'How to use:',
+                instruction1: 'Enter your question about the database in plain English',
+                instruction2: 'The system will generate and execute appropriate SQL queries',
+                instruction3: "You'll receive a human-readable summary of the results",
+                questionPlaceholder: 'Enter your question here...',
+                submitButton: 'Get Answer',
+                processing: 'Processing...',
+                error: 'Error',
+                answer: 'Answer:',
+                pleaseEnterQuestion: 'Please enter a question'
+            },
+            zh: {
+                title: 'AI SQL 助手',
+                howToUseTitle: '使用说明：',
+                instruction1: '用自然语言输入您的数据库相关问题',
+                instruction2: '系统将生成并执行相应的SQL查询',
+                instruction3: '您将收到易于理解的结果摘要',
+                questionPlaceholder: '在此输入您的问题...',
+                submitButton: '获取答案',
+                processing: '处理中...',
+                error: '错误',
+                answer: '答案：',
+                pleaseEnterQuestion: '请输入问题'
+            }
+        };
+
+        // Initialize language
+        let currentLang = 'en';
+
+        // Function to switch language
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // Update active button state
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            // Update all text elements
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = translations[lang][key];
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                element.placeholder = translations[lang][key];
+            });
+        }
+
+        // Initialize with English
+        switchLanguage('en');
+
         function askQuestion() {
             const question = document.getElementById('questionInput').value;
             const resultDiv = document.getElementById('result');
             
             if (!question) {
-                alert('Please enter a question');
+                alert(translations[currentLang].pleaseEnterQuestion);
                 return;
             }
 
-            // Disable button while processing
             const button = document.getElementById('submitButton');
             button.disabled = true;
-            button.textContent = 'Processing...';
+            button.textContent = translations[currentLang].processing;
 
             fetch('/ask', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ question: question })
+                body: JSON.stringify({ 
+                    question: question,
+                    language: currentLang  // Send language preference to server
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    resultDiv.innerHTML = `<p style="color: red;">${translations[currentLang].error}: ${data.error}</p>`;
                 } else {
-                    // Format the summary with proper HTML line breaks
                     const formattedSummary = data.summary
-                        .replace(/\n/g, '<br>')  // Replace newlines with <br>
-                        .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')  // Replace tabs with spaces
-                        .replace(/(SQL Query:)/g, '<strong>$1</strong>')  // Bold "SQL Query:" text
-                        .replace(/(Results:)/g, '<strong>$1</strong>');   // Bold "Results:" text
+                        .replace(/\n/g, '<br>')
+                        .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+                        .replace(/(SQL Query:|SQL查询:)/g, '<strong>$1</strong>')
+                        .replace(/(Results:|结果:)/g, '<strong>$1</strong>');
                     
                     resultDiv.innerHTML = `
-                        <h3>Answer:</h3>
+                        <h3>${translations[currentLang].answer}</h3>
                         <div class="result-content">${formattedSummary}</div>
                     `;
                 }
                 resultDiv.style.display = 'block';
             })
             .catch(error => {
-                resultDiv.innerHTML = `<p style="color: red;">Error: ${error}</p>`;
+                resultDiv.innerHTML = `<p style="color: red;">${translations[currentLang].error}: ${error}</p>`;
                 resultDiv.style.display = 'block';
             })
             .finally(() => {
                 button.disabled = false;
-                button.textContent = 'Get Answer';
+                button.textContent = translations[currentLang].submitButton;
             });
         }
     </script>
