@@ -26,6 +26,7 @@ services:
     image: aidb:latest
     container_name: aidb
     restart: always
+    working_dir: /home/work/aidb
     volumes:
       - ./src:/home/work/aidb
     command: tail -f /dev/null
