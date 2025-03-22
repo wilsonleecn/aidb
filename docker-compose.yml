@@ -21,3 +21,10 @@ services:
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
       - /data/db:/var/lib/mysql
+
+  aidb:
+    image: aidb:latest
+    container_name: aidb
+    restart: always
+    volumes:
+      - ./src:/home/work/aidb
