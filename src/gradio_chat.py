@@ -13,12 +13,12 @@ TRANSLATIONS = {
         "loading": "正在查询中...",
         "error": "抱歉，处理您的请求时出现错误: {}",
         "examples": [
-            "我们一共有多少个domain",
             "How many domains do we have?",
-            "在dev1 domain中，一共有多少个server正在运行configportal service",
+           "我们一共有多少个domain",
             "In dev1, how many servers are running the configportal service?",
-            "请列出staging domain中所有运行logserver service 的服务器IP和它们的servergroup",
-            "Please list all the server IPs and their servergroups running the logserver service in the staging domain."
+            "在dev1 domain中，一共有多少个server正在运行configportal service",
+            "Please list all the server IPs and their servergroup running the logserver service in domain dev2."
+            "请列出domain dev2中所有运行logserver service 的服务器IP和它们的servergroup"
         ],
         "sql_section": "执行的SQL语句：",
         "result_section": "查询结果：",
@@ -33,12 +33,12 @@ TRANSLATIONS = {
         "loading": "Querying...",
         "error": "Sorry, an error occurred: {}",
         "examples": [
-           "我们一共有多少个domain",
             "How many domains do we have?",
-            "在dev1 domain中，一共有多少个server正在运行configportal service",
+           "我们一共有多少个domain",
             "In dev1, how many servers are running the configportal service?",
-            "请列出staging domain中所有运行logserver service 的服务器IP和它们的servergroup",
-            "Please list all the server IPs and their servergroups running the logserver service in the staging domain."
+            "在dev1 domain中，一共有多少个server正在运行configportal service",
+            "Please list all the server IPs and their servergroup running the logserver service in domain dev2."
+            "请列出domain dev2中所有运行logserver service 的服务器IP和它们的servergroup"
         ],
         "sql_section": "Executed SQL:",
         "result_section": "Query Results:",
@@ -48,7 +48,7 @@ TRANSLATIONS = {
 
 class SQLChatBot:
     def __init__(self):
-        self.current_lang = "zh"
+        self.current_lang = "en"
     
     def switch_language(self, lang: str) -> Dict[str, str]:
         """Switch interface language and return new interface text"""
@@ -92,24 +92,24 @@ def create_interface():
             )
         
         # Title and description
-        title = gr.Markdown(f"# {TRANSLATIONS['zh']['title']}")
-        description = gr.Markdown(TRANSLATIONS['zh']['description'])
+        title = gr.Markdown(f"# {TRANSLATIONS['en']['title']}")
+        description = gr.Markdown(TRANSLATIONS['en']['description'])
         
         # Chat interface
         chatbot = gr.Chatbot(height=400)
         msg = gr.Textbox(
-            placeholder=TRANSLATIONS['zh']['description'],
+            placeholder=TRANSLATIONS['en']['description'],
             show_label=False
         )
         
         # Control buttons
         with gr.Row():
-            clear = gr.Button(TRANSLATIONS['zh']['clear_btn'])
+            clear = gr.Button(TRANSLATIONS['en']['clear_btn'])
             submit = gr.Button("Send", variant="primary")
         
         # Example questions (no need to store in variable)
         gr.Examples(
-            examples=TRANSLATIONS['zh']['examples'],
+            examples=TRANSLATIONS['en']['examples'],
             inputs=msg
         )
 
