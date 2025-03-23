@@ -14,8 +14,11 @@ TRANSLATIONS = {
         "error": "抱歉，处理您的请求时出现错误: {}",
         "examples": [
             "我们一共有多少个domain",
+            "How many domains do we have?",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
-            "请列出staging domain中所有运行logserver service 的服务器IP和它们的servergroup"
+            "In dev1, how many servers are running the configportal service?",
+            "请列出staging domain中所有运行logserver service 的服务器IP和它们的servergroup",
+            "Please list all the server IPs and their servergroups running the logserver service in the staging domain."
         ],
         "sql_section": "执行的SQL语句：",
         "result_section": "查询结果：",
@@ -30,8 +33,11 @@ TRANSLATIONS = {
         "loading": "Querying...",
         "error": "Sorry, an error occurred: {}",
         "examples": [
+           "我们一共有多少个domain",
             "How many domains do we have?",
+            "在dev1 domain中，一共有多少个server正在运行configportal service",
             "In dev1, how many servers are running the configportal service?",
+            "请列出staging domain中所有运行logserver service 的服务器IP和它们的servergroup",
             "Please list all the server IPs and their servergroups running the logserver service in the staging domain."
         ],
         "sql_section": "Executed SQL:",
@@ -101,8 +107,8 @@ def create_interface():
             clear = gr.Button(TRANSLATIONS['zh']['clear_btn'])
             submit = gr.Button("Send", variant="primary")
         
-        # Example questions
-        examples = gr.Examples(
+        # Example questions (no need to store in variable)
+        gr.Examples(
             examples=TRANSLATIONS['zh']['examples'],
             inputs=msg
         )
@@ -134,11 +140,10 @@ def create_interface():
                 f"# {trans['title']}",
                 trans['description'],
                 trans['clear_btn'],
-                trans['description'],  # Update textbox placeholder
-                trans['examples']
+                trans['description']  # Update textbox placeholder
             )
         
-        # Register language change event
+        # Remove examples from outputs
         language_radio.change(
             fn=on_language_change,
             inputs=[language_radio],
@@ -146,8 +151,7 @@ def create_interface():
                 title,
                 description,
                 clear,
-                msg,  # Update textbox placeholder
-                examples
+                msg  # Update textbox placeholder
             ]
         )
     
