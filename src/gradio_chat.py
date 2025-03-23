@@ -156,6 +156,5 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
         server_port=5000,
-        share=False,
-        favicon_path="🤖"
+        share=False
     ) 
