@@ -12,8 +12,8 @@ services:
       - MARIADB_USER=dbuser
       - MARIADB_PASSWORD=db3213
     # Expose the MySQL port
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     # Mount our init scripts
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
