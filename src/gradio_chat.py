@@ -18,7 +18,7 @@ TRANSLATIONS = {
             "In dev1, how many servers are running the configportal service?",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
-            "请列出domain dev2中所有运行logserver service 的服务器IP和它们的servergroup"
+            "dev1里面有多少个Logserver，请列出ip"
         ],
         "sql_section": "执行的SQL语句：",
         "result_section": "查询结果：",
@@ -38,7 +38,7 @@ TRANSLATIONS = {
             "In dev1, how many servers are running the configportal service?",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
-            "请列出domain dev2中所有运行logserver service 的服务器IP和它们的servergroup"
+            "dev1里面有多少个Logserver，请列出ip"
         ],
         "sql_section": "Executed SQL:",
         "result_section": "Query Results:",
