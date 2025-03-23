@@ -1,9 +1,8 @@
 import gradio as gr
 import json
 from typing import Dict, Any
-from web_server import process_question  # Import existing processing function
+from web_server import process_question
 
-# Interface text translations
 TRANSLATIONS = {
     "zh": {
         "title": "DevOps查询助手",
@@ -46,66 +45,38 @@ class SQLChatBot:
         self.current_lang = "zh"
     
     def switch_language(self, lang: str) -> Dict[str, str]:
-        """
-        Switch interface language and return new interface text
-        Args:
-            lang: Language selection ("中文" or "English")
-        Returns:
-            Dictionary containing translated interface text
-        """
+        """Switch interface language and return new interface text"""
         self.current_lang = "zh" if lang == "中文" else "en"
         return TRANSLATIONS[self.current_lang]
     
     def format_response(self, response: Dict[str, Any]) -> str:
-        """
-        Format the response message with proper sections and formatting
-        Args:
-            response: Dictionary containing SQL, result, and summary
-        Returns:
-            Formatted message string with markdown formatting
-        """
+        """Format the response message with proper sections and formatting"""
         trans = TRANSLATIONS[self.current_lang]
         
-        # Format SQL section
         formatted_msg = f"**{trans['sql_section']}**\n```sql\n{response['sql']}\n```\n\n"
-        
-        # Format query results section
         formatted_msg += f"**{trans['result_section']}**\n```json\n{json.dumps(response['result'], indent=2, ensure_ascii=False)}\n```\n\n"
-        
-        # Format summary section
         formatted_msg += f"**{trans['summary_section']}**\n{response['summary']}"
         
         return formatted_msg
 
-    def process_query(self, message: str, history: list) -> str:
-        """
-        Process user query and return formatted response
-        Args:
-            message: User input message
-            history: Chat history (not used currently)
-        Returns:
-            Formatted response string or error message
-        """
+    def process_query(self, message: str, history: list) -> tuple:
+        """Process user query and return formatted response"""
         try:
-            # Call existing processing function
             response = process_question(message)
-            
-            # Format and return response
-            return self.format_response(response)
-            
+            formatted_response = self.format_response(response)
+            history.append((message, formatted_response))
+            return history, "", history
         except Exception as e:
-            return TRANSLATIONS[self.current_lang]["error"].format(str(e))
+            error_msg = TRANSLATIONS[self.current_lang]["error"].format(str(e))
+            history.append((message, error_msg))
+            return history, "", history
 
 def create_interface():
-    """
-    Create and configure the Gradio interface
-    Returns:
-        Configured Gradio Blocks interface
-    """
+    """Create and configure the Gradio interface"""
     bot = SQLChatBot()
     
     with gr.Blocks(css="#chatbot {height: 600px} .message { font-size: 15px }") as demo:
-        # Language selection at the top
+        # Language selection
         with gr.Row():
             language_radio = gr.Radio(
                 choices=["中文", "English"],
@@ -119,32 +90,51 @@ def create_interface():
         description = gr.Markdown(TRANSLATIONS['zh']['description'])
         
         # Chat interface
-        chatbot = gr.ChatInterface(
-            fn=bot.process_query,
-            examples=TRANSLATIONS['zh']['examples'],
-            retry_btn=gr.Button(TRANSLATIONS['zh']['retry_btn']),
-            undo_btn=None,
-            clear_btn=gr.Button(TRANSLATIONS['zh']['clear_btn']),
-            title="",
-            description="",
-            theme="soft",
+        chatbot = gr.Chatbot(height=400)
+        msg = gr.Textbox(
+            placeholder=TRANSLATIONS['zh']['description'],
+            show_label=False
         )
+        
+        # Control buttons
+        with gr.Row():
+            clear = gr.Button(TRANSLATIONS['zh']['clear_btn'])
+            submit = gr.Button("Send", variant="primary")
+        
+        # Example questions
+        gr.Examples(
+            examples=TRANSLATIONS['zh']['examples'],
+            inputs=msg
+        )
+
+        # Setup chat functionality
+        state = gr.State([])
+
+        submit_click = submit.click(
+            bot.process_query,
+            inputs=[msg, state],
+            outputs=[chatbot, msg, state],
+            show_progress=True
+        )
+
+        msg.submit(
+            bot.process_query,
+            inputs=[msg, state],
+            outputs=[chatbot, msg, state],
+            show_progress=True
+        )
+
+        clear.click(lambda: ([], "", []), outputs=[chatbot, msg, state])
         
         # Language change handler
         def on_language_change(lang):
-            """
-            Handle language change events
-            Args:
-                lang: Selected language
-            Returns:
-                Tuple of updated interface elements
-            """
+            """Handle language change events"""
             trans = bot.switch_language(lang)
             return (
                 f"# {trans['title']}",
                 trans['description'],
                 trans['clear_btn'],
-                trans['retry_btn']
+                trans['description']  # Update textbox placeholder
             )
         
         # Register language change event
@@ -154,8 +144,8 @@ def create_interface():
             outputs=[
                 title,
                 description,
-                chatbot.clear_btn,
-                chatbot.retry_btn
+                clear,
+                msg  # Update textbox placeholder
             ]
         )
     
@@ -165,7 +155,7 @@ if __name__ == "__main__":
     demo = create_interface()
     demo.launch(
         server_name="0.0.0.0",
-        server_port=5000,
-        share=False,  # Set to True to generate public access link
+        server_port=7860,
+        share=False,
         favicon_path="🤖"
-    )
+    ) 
