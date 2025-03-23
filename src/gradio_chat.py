@@ -42,7 +42,7 @@ TRANSLATIONS = {
 
 class SQLChatBot:
     def __init__(self):
-        self.current_lang = "zh"
+        self.current_lang = "en"
     
     def switch_language(self, lang: str) -> Dict[str, str]:
         """Switch interface language and return new interface text"""
@@ -62,8 +62,10 @@ class SQLChatBot:
     def process_query(self, message: str, history: list) -> tuple:
         """Process user query and return formatted response"""
         try:
+            print(f"\nUser Message: {message}")
             response = process_question(message)
             formatted_response = self.format_response(response)
+            print(f"Bot Response: {formatted_response}\n")
             history.append((message, formatted_response))
             return history, "", history
         except Exception as e:
