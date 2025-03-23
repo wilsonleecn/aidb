@@ -80,7 +80,8 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list) -> st
             "role": "system",
             "content": (
                 "You are an AI that produces a concise, user-friendly summary of multiple SQL statements "
-                "and their corresponding results. Address the user's question directly in clear, natural language."
+                "and their corresponding results. Address the user's question directly in clear, natural language. "
+                "If the user's question contains Chinese characters, respond in Chinese. Otherwise, respond in English."
             )
         },
         {
