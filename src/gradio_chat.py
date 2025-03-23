@@ -42,31 +42,29 @@ TRANSLATIONS = {
 
 class SQLChatBot:
     def __init__(self):
-        self.current_lang = "en"
+        self.current_lang = "zh"
     
     def switch_language(self, lang: str) -> Dict[str, str]:
         """Switch interface language and return new interface text"""
         self.current_lang = "zh" if lang == "中文" else "en"
         return TRANSLATIONS[self.current_lang]
     
-    def format_response(self, response: Dict[str, Any]) -> str:
-        """Format the response message with proper sections and formatting"""
-        trans = TRANSLATIONS[self.current_lang]
+    # def format_response(self, response: Dict[str, Any]) -> str:
+    #     """Format the response message with proper sections and formatting"""
+    #     trans = TRANSLATIONS[self.current_lang]
         
-        formatted_msg = f"**{trans['sql_section']}**\n```sql\n{response['sql']}\n```\n\n"
-        formatted_msg += f"**{trans['result_section']}**\n```json\n{json.dumps(response['result'], indent=2, ensure_ascii=False)}\n```\n\n"
-        formatted_msg += f"**{trans['summary_section']}**\n{response['summary']}"
+    #     formatted_msg = f"**{trans['sql_section']}**\n```sql\n{response['sql']}\n```\n\n"
+    #     formatted_msg += f"**{trans['result_section']}**\n```json\n{json.dumps(response['result'], indent=2, ensure_ascii=False)}\n```\n\n"
+    #     formatted_msg += f"**{trans['summary_section']}**\n{response['summary']}"
         
-        return formatted_msg
+    #     return formatted_msg
 
     def process_query(self, message: str, history: list) -> tuple:
         """Process user query and return formatted response"""
         try:
-            print(f"\nUser Message: {message}")
             response = process_question(message)
-            formatted_response = self.format_response(response)
-            print(f"Bot Response: {formatted_response}\n")
-            history.append((message, formatted_response))
+            # formatted_response = self.format_response(response)
+            history.append((message, response))
             return history, "", history
         except Exception as e:
             error_msg = TRANSLATIONS[self.current_lang]["error"].format(str(e))
@@ -104,7 +102,7 @@ def create_interface():
             submit = gr.Button("Send", variant="primary")
         
         # Example questions
-        gr.Examples(
+        examples = gr.Examples(
             examples=TRANSLATIONS['zh']['examples'],
             inputs=msg
         )
@@ -136,7 +134,8 @@ def create_interface():
                 f"# {trans['title']}",
                 trans['description'],
                 trans['clear_btn'],
-                trans['description']  # Update textbox placeholder
+                trans['description'],  # Update textbox placeholder
+                trans['examples']
             )
         
         # Register language change event
@@ -147,7 +146,8 @@ def create_interface():
                 title,
                 description,
                 clear,
-                msg  # Update textbox placeholder
+                msg,  # Update textbox placeholder
+                examples
             ]
         )
     
