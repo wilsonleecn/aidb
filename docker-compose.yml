@@ -30,4 +30,5 @@ services:
       - ./src:/home/work/aidb
     ports:
       - "5000:5000"
-    command: python web_server.py
+    # command: python web_server.py
+    command: python gradio_chat.py
