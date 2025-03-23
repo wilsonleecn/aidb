@@ -85,9 +85,9 @@ def create_interface():
         # Language selection
         with gr.Row():
             language_radio = gr.Radio(
-                choices=["中文", "English"],
-                value="中文",
-                label="语言/Language",
+                choices=["English", "中文"],
+                value="English",
+                label="Language",
                 interactive=True
             )
         
