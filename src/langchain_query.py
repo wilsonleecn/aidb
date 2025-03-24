@@ -1,6 +1,6 @@
 from langchain_community.llms import OpenAI
 from langchain_community.utilities import SQLDatabase
-from langchain_community.chains import SQLDatabaseChain
+from langchain.chains.sql_database.query import create_sql_query_chain
 from langchain.prompts.prompt import PromptTemplate
 import os
 from config_reader import Config
@@ -30,12 +30,11 @@ def setup_database_chain():
     )
 
     # 创建数据库链
-    db_chain = SQLDatabaseChain(
+    db_chain = create_sql_query_chain(
         llm=llm,
-        database=db,
+        db=db,
         prompt=PROMPT,
-        verbose=True,
-        return_direct=False
+        verbose=True
     )
     
     return db_chain
@@ -47,7 +46,7 @@ def query_database(question: str) -> str:
         db_chain = setup_database_chain()
         
         # 执行查询
-        result = db_chain.run(question)
+        result = db_chain.invoke({"question": question})
         
         return result
     except Exception as e:
