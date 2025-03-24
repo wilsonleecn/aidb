@@ -48,7 +48,7 @@ def encrypt_results(results: List[dict], encryptor: ValueEncryptor) -> List[dict
         encrypted_results.append(encrypted_item)
     return encrypted_results
 
-def summarize_sql_result(user_question: str, sqls: str, all_results: list) -> str:
+def summarize_sql_result(user_question: str, sqls: str, all_results: list, language: str = "en") -> str:
     """
     Calls OpenAI to produce a user-friendly summary of multiple SQL statements and their results.
     
@@ -56,6 +56,7 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list) -> st
         user_question (str): The original user question.
         sql_answer (str): The raw SQL answer from OpenAI (could contain multiple statements).
         all_results (list): A list of dicts, where each dict has {"query": <SQL>, "result": <list of rows>}.
+        language (str): Target language for the response ("en" or "zh").
 
     Returns:
         str: A natural-language summary of the results suitable for displaying to the user.
@@ -74,16 +75,18 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list) -> st
     for idx, item in enumerate(encrypted_results, start=1):
         content_str += f"Statement #{idx}:\nSQL Query:\n{item['query']}\nResult:\n{repr(item['result'])}\n\n"
 
+    # Prepare the system message based on language
+    if language == "zh":
+        system_msg = "你是一个人工智能，可以生成多个 SQL 语句的简洁、用户友好的摘要及其相应的结果。用清晰、自然的语言直接回答用户的问题。 "
+    else:
+        system_msg = "You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Address the user's question directly in clear, natural language. "
+        
     # We'll feed the above to the model in the user message
     # So the system prompt sets the role, the user prompt includes the question, the query, the results
     messages = [
         {
             "role": "system",
-            "content": (
-                "You are an AI that produces a concise, user-friendly summary of multiple SQL statements "
-                "and their corresponding results. Address the user's question directly in clear, natural language. "
-                # "If the user's question contains Chinese characters, respond in Chinese. Otherwise, respond in English."
-            )
+            "content": system_msg
         },
         {
             "role": "user",
