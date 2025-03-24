@@ -33,8 +33,7 @@ def setup_database_chain():
     db_chain = create_sql_query_chain(
         llm=llm,
         db=db,
-        prompt=PROMPT,
-        verbose=True
+        prompt=PROMPT
     )
     
     return db_chain
