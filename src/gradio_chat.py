@@ -98,6 +98,7 @@ class SQLChatBot:
                     # 从 process_question 获取中间过程数据
                     "generated_sql": getattr(response, 'generated_sql', None),
                     "query_results": getattr(response, 'query_results', None),
+                    "summary_process": getattr(response, 'metadata', {}).get('summary_process', {}),
                     "status": "success"
                 }
             )
