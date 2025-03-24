@@ -17,7 +17,7 @@ def ask():
         return jsonify({'error': 'Question is required'}), 400
     
     try:
-        result = process_question(question)
+        result = process_question(question, language)  # Pass language parameter to process_question
         return jsonify({'summary': result})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

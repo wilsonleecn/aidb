@@ -84,7 +84,7 @@ Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
 """
 
-def generate_statements_from_question(user_question: str, config_path: str) -> list:
+def generate_statements_from_question(user_question: str) -> list:
     """
     1) Calls get_metadata to fetch domain/server group/service names from DB.
     2) Calls build_domain_alias_prompt to fetch domain alias to generate prompt from DB.
@@ -93,14 +93,13 @@ def generate_statements_from_question(user_question: str, config_path: str) -> l
 
     Args:
         user_question (str): Natural language question from the user.
-        config_path (str): Path to the DB config file for fetching metadata (e.g., 'db_config.ini').
 
     Returns:
         str: The SQL query (as a string).
     """
     # Get actual domain/servergroup/service names from the DB:
-    domain_alias_prompt = build_domain_alias_prompt(config_path)
-    helper_info = get_metadata(config_path)
+    domain_alias_prompt = build_domain_alias_prompt()
+    helper_info = get_metadata()
     # Combine the schema and the dynamic helper info in the system prompt
     system_prompt = SYSTEM_PROMPT_BASE + "\n\n" + DB_SCHEMA_PROMPT + "\n\n" + helper_info + "\n\n" + domain_alias_prompt
 
@@ -154,7 +153,7 @@ def parse_multiple_queries(sql_answer: str) -> list:
             statements.append(stmt)
     return statements
 
-def execute_multiple_queries(sqls: str, config_path: str) -> list:
+def execute_multiple_queries(sqls: str) -> list:
     """
     Parses the SQL answer into individual statements,
     executes each, and collects results.
@@ -172,7 +171,7 @@ def execute_multiple_queries(sqls: str, config_path: str) -> list:
     #Execute statements and collect the results
     for stmt in statements:
         # run_sql_from_config returns a list of dicts
-        query_result = run_sql_from_config(stmt, config_path)
+        query_result = run_sql_from_config(stmt)
         results_list.append({"query": stmt, "result": query_result})
     
     return results_list

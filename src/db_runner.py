@@ -4,13 +4,12 @@
 import pymysql
 from config_reader import Config
 
-def run_sql_from_config(sql_str: str, config_path: str):
+def run_sql_from_config(sql_str: str):
     """
-    Reads the configuration file, connects to the MariaDB database, executes the SQL statement, and returns the result.
+    Connects to the MariaDB database, executes the SQL statement, and returns the result.
     
     Args:
         sql_str (str): The SQL statement to be executed.
-        config_path (str): The path to the configuration file (e.g., 'db_config.ini').
 
     Returns:
         list: The query result, where each row is a dictionary.

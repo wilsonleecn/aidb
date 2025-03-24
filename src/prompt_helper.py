@@ -3,27 +3,24 @@
 
 from db_runner import run_sql_from_config
 
-def get_metadata(config_path: str) -> str:
+def get_metadata() -> str:
     """
     Retrieves domain names, server group names, and service names from the database,
     and returns them as a helper info string.
-
-    Args:
-        config_path (str): Path to the DB config file (e.g., 'db_config.ini').
 
     Returns:
         str: A text listing available domains, server groups, and services.
     """
     # Fetch domain names
-    domain_rows = run_sql_from_config("SELECT name FROM Domain;", config_path)
+    domain_rows = run_sql_from_config("SELECT name FROM Domain;")
     domain_names = [row["name"] for row in domain_rows]
 
     # Fetch server group names
-    sg_rows = run_sql_from_config("SELECT name FROM ServerGroup;", config_path)
+    sg_rows = run_sql_from_config("SELECT name FROM ServerGroup;")
     server_group_names = [row["name"] for row in sg_rows]
 
     # Fetch service names
-    service_rows = run_sql_from_config("SELECT name FROM Service;", config_path)
+    service_rows = run_sql_from_config("SELECT name FROM Service;")
     service_names = [row["name"] for row in service_rows]
 
     # Build the helper info string
@@ -35,7 +32,7 @@ def get_metadata(config_path: str) -> str:
 
     return helper_info
 
-def build_domain_alias_prompt(config_path: str) -> str:
+def build_domain_alias_prompt() -> str:
     """
     Queries ResourceAlias for resource_type='domain', joins Domain to get domain names,
     and constructs a text block listing all domains and their aliases in a human-readable format.
@@ -44,9 +41,6 @@ def build_domain_alias_prompt(config_path: str) -> str:
       "The following domains and their aliases exist:
        - Domain 'dev1' can also be called: DE, Dev QA Europe
        - Domain 'prod1' can also be called: production, PRD1"
-
-    Args:
-        config_path (str): Path to your DB config file for run_sql_from_config.
 
     Returns:
         str: A multi-line string that enumerates each domain's aliases.
@@ -59,7 +53,7 @@ def build_domain_alias_prompt(config_path: str) -> str:
       JOIN Domain d ON ra.resource_id = d.id
      WHERE ra.resource_type = 'domain';
     """
-    rows = run_sql_from_config(sql, config_path)
+    rows = run_sql_from_config(sql)
     # rows is typically a list of dicts, e.g.:
     # [ {"domain_name": "dev1", "alias_name": "DE"},
     #   {"domain_name": "dev1", "alias_name": "Dev QA Europe"},
