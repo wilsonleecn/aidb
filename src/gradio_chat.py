@@ -5,6 +5,7 @@ from web_server import process_question
 from chat_logger import ChatLogger
 import uuid
 import os
+from datetime import datetime
 
 TRANSLATIONS = {
     "zh": {
@@ -81,7 +82,9 @@ class SQLChatBot:
             )
             
             # 处理查询
-            response = process_question(message)
+            start_time = datetime.now().isoformat()
+            response = process_question(message, self.current_lang)
+            end_time = datetime.now().isoformat()
             
             # 记录系统响应
             self.logger.add_message(
@@ -89,7 +92,13 @@ class SQLChatBot:
                 content=response,
                 role="assistant",
                 metadata={
-                    "language": self.current_lang
+                    "language": self.current_lang,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    # 从 process_question 获取中间过程数据
+                    "generated_sql": getattr(response, 'generated_sql', None),
+                    "query_results": getattr(response, 'query_results', None),
+                    "status": "success"
                 }
             )
             
@@ -114,7 +123,10 @@ class SQLChatBot:
                 role="error",
                 metadata={
                     "error_type": type(e).__name__,
-                    "error_details": str(e)
+                    "error_details": str(e),
+                    "language": self.current_lang,
+                    "status": "error",
+                    "timestamp": datetime.now().isoformat()
                 }
             )
             

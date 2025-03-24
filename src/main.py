@@ -7,7 +7,7 @@ from datetime import datetime
 
 def process_question(user_question, language: str = "en"):
     """
-    Process a question and return the summary
+    Process a question and return the summary and metadata
     """
     # 记录中间过程的元数据
     metadata = {
@@ -30,7 +30,16 @@ def process_question(user_question, language: str = "en"):
         metadata["end_time"] = datetime.now().isoformat()
         metadata["status"] = "success"
         
-        return summary
+        # 创建一个带有额外属性的 Response 对象
+        class Response(str):
+            pass
+            
+        response = Response(summary)
+        response.metadata = metadata
+        response.generated_sql = sqls
+        response.query_results = all_results
+        
+        return response
         
     except Exception as e:
         metadata["end_time"] = datetime.now().isoformat()
