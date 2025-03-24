@@ -1,4 +1,4 @@
-from langchain_community.llms import OpenAI
+from langchain_openai import OpenAI
 from langchain_community.utilities import SQLDatabase
 from langchain.chains.sql_database.query import create_sql_query_chain
 from langchain.prompts.prompt import PromptTemplate
@@ -16,16 +16,19 @@ def setup_database_chain():
     # 连接数据库
     db = SQLDatabase.from_uri(Config.get_db_url())
     
-    # 自定义提示模板
+    # 自定义提示模板，包含所有必需的变量
     custom_prompt = """给定一个问题，首先创建一个符合语法的 SQL 查询来回答该问题。
     然后查看查询结果，并用自然语言回答问题。
 
-    仅使用以下表中的列来回答问题。
+    仅使用以下表信息来回答问题：
+    {table_info}
+
+    Top {top_k} 最相关的表：
 
     问题: {input}"""
 
     PROMPT = PromptTemplate(
-        input_variables=["input"],
+        input_variables=["input", "table_info", "top_k"],
         template=custom_prompt
     )
 
