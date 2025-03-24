@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
-import openai
+from openai import OpenAI
 import hashlib
 import base64
 from typing import Any, Dict, List
 from config_reader import Config
 
-# Set your OpenAI API key:
-openai.api_key = Config.OPENAI_API_KEY
+# Initialize the OpenAI client
+client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 class ValueEncryptor:
     def __init__(self):
