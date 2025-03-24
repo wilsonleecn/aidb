@@ -26,6 +26,7 @@ def process_question(user_question, language: str = "en"):
         
         # 生成摘要
         summary = summarize_sql_result(user_question, sqls, all_results, language)
+        metadata["query_results"] = language
         
         metadata["end_time"] = datetime.now().isoformat()
         metadata["status"] = "success"
