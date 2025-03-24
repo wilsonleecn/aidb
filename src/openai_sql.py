@@ -8,7 +8,7 @@ import re
 import openai
 from prompt_helper import get_metadata, build_domain_alias_prompt
 from db_runner import run_sql_from_config
-from .config_reader import Config
+from config_reader import Config
 
 # Set OpenAI API key
 openai.api_key = Config.OPENAI_API_KEY
