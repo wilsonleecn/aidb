@@ -4,7 +4,7 @@ FROM python:3.9-slim
 RUN pip install --upgrade pip && \
     pip install pymysql configparser flask==3.0.2 gradio && \
     pip install --no-cache-dir --upgrade openai && \
-    pip install langchain pymysql sqlalchemy
+    pip install langchain-community pymysql sqlalchemy
 
 CMD ["python3"]
 

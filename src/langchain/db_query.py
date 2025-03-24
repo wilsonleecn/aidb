@@ -1,6 +1,6 @@
-from langchain.llms import OpenAI
-from langchain.sql_database import SQLDatabase
-from langchain_experimental.sql import SQLDatabaseChain
+from langchain_community.llms import OpenAI
+from langchain_community.utilities import SQLDatabase
+from langchain.chains import create_sql_query_chain
 from langchain.prompts.prompt import PromptTemplate
 import os
 from ..config_reader import Config
