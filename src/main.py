@@ -9,32 +9,32 @@ def process_question(user_question, language: str = "en"):
     """
     Process a question and return the summary and metadata
     """
-    # 记录中间过程的元数据
+    # metadata in process
     metadata = {
         "start_time": datetime.now().isoformat(),
         "language": language
     }
     
     try:
-        # 生成 SQL
+        # generate SQL
         sqls = generate_statements_from_question(user_question)
         metadata["generated_sql"] = sqls
         
-        # 执行查询
+        # execute sql
         all_results = execute_multiple_queries(sqls)
         metadata["query_results"] = all_results
         
-        # 生成摘要
+        # generate summary
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
-        # 添加摘要生成过程的元数据
+        # update metadata 
         metadata.update({
             "end_time": datetime.now().isoformat(),
             "status": "success"
         })
         metadata["summary_process"] = getattr(summary, 'metadata', {})
         
-        # 创建一个带有额外属性的 Response 对象
+        # add more object into response which will be returned
         class Response(str):
             pass
             
