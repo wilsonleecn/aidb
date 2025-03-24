@@ -5,11 +5,13 @@
 
 import os
 import re
-from openai import OpenAI
+import openai
 from prompt_helper import get_metadata, build_domain_alias_prompt
 from db_runner import run_sql_from_config
+from .config_reader import Config
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Set OpenAI API key
+openai.api_key = Config.OPENAI_API_KEY
 
 # Prepare the database schema prompt you want the AI to know:
 DB_SCHEMA_PROMPT = """

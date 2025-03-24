@@ -1,26 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from pathlib import Path
+from dotenv import load_dotenv
+import os
 
-import configparser
+# Get the src directory path
+SRC_DIR = Path(__file__).resolve().parent
+ENV_PATH = SRC_DIR / '.env'
 
-def read_db_config(config_path: str):
-    """
-    Reads the database configuration from an INI file.
+# Load environment variables from .env file
+load_dotenv(dotenv_path=ENV_PATH)
 
-    Args:
-        config_path (str): Path to the configuration file (e.g., 'db_config.ini').
+class Config:
+    # OpenAI configuration
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-    Returns:
-        dict: A dictionary with host, port, db, user, password.
-    """
-    config = configparser.ConfigParser()
-    config.read(config_path, encoding='utf-8')
+    # Database configuration
+    DB_HOST = os.getenv('DB_HOST', 'localhost')
+    DB_PORT = int(os.getenv('DB_PORT', 3306))
+    DB_NAME = os.getenv('DB_NAME', 'serverconf')
+    DB_USER = os.getenv('DB_USER', 'root')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
 
-    db_conf = {
-        "host": config["database"]["host"],
-        "port": int(config["database"]["port"]),
-        "db": config["database"]["db"],
-        "user": config["database"]["user"],
-        "password": config["database"]["password"],
-    }
-    return db_conf
+    @classmethod
+    def get_db_url(cls):
+        return f"mysql+pymysql://{cls.DB_USER}:{cls.DB_PASSWORD}@{cls.DB_HOST}:{cls.DB_PORT}/{cls.DB_NAME}"
