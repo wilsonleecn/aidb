@@ -6,7 +6,7 @@ import openai
 import hashlib
 import base64
 from typing import Any, Dict, List
-from .config_reader import Config
+from config_reader import Config
 
 # Set your OpenAI API key:
 openai.api_key = Config.OPENAI_API_KEY
