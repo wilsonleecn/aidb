@@ -56,7 +56,7 @@ def query_database(question: str) -> str:
 
 if __name__ == "__main__":
     # 测试示例
-    question = "数据库中有多少台服务器？"
+    question = "数据库中有多少个domain？"
     answer = query_database(question)
     print(f"问题: {question}")
     print(f"回答: {answer}") 
