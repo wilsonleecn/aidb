@@ -3,7 +3,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain.chains import create_sql_query_chain
 from langchain.prompts.prompt import PromptTemplate
 import os
-from config_reader import Config
+from ./config_reader import Config
 
 def setup_database_chain():
     """设置数据库链接和 LangChain"""
