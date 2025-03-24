@@ -26,10 +26,13 @@ def process_question(user_question, language: str = "en"):
         
         # 生成摘要
         summary = summarize_sql_result(user_question, sqls, all_results, language)
-        metadata["query_results"] = language
         
-        metadata["end_time"] = datetime.now().isoformat()
-        metadata["status"] = "success"
+        # 添加摘要生成过程的元数据
+        metadata.update({
+            "end_time": datetime.now().isoformat(),
+            "status": "success",
+            "summary_process": getattr(summary, 'metadata', {}),  # 包含 messages 和 summary 信息
+        })
         
         # 创建一个带有额外属性的 Response 对象
         class Response(str):

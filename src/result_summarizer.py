@@ -51,17 +51,7 @@ def encrypt_results(results: List[dict], encryptor: ValueEncryptor) -> List[dict
 def summarize_sql_result(user_question: str, sqls: str, all_results: list, language: str = "en") -> str:
     """
     Calls OpenAI to produce a user-friendly summary of multiple SQL statements and their results.
-    
-    Args:
-        user_question (str): The original user question.
-        sql_answer (str): The raw SQL answer from OpenAI (could contain multiple statements).
-        all_results (list): A list of dicts, where each dict has {"query": <SQL>, "result": <list of rows>}.
-        language (str): Target language for the response ("en" or "zh").
-
-    Returns:
-        str: A natural-language summary of the results suitable for displaying to the user.
     """
-
     # Create an encryptor instance
     encryptor = ValueEncryptor()
     
@@ -81,8 +71,7 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
     else:
         system_msg = "You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Address the user's question directly in clear, natural language. "
         
-    # We'll feed the above to the model in the user message
-    # So the system prompt sets the role, the user prompt includes the question, the query, the results
+    # Prepare messages for OpenAI
     messages = [
         {
             "role": "system",
@@ -93,6 +82,7 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
             "content": content_str
         }
     ]
+    
     # Make the request to OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -103,4 +93,20 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
     # Extract the assistant's answer and decrypt the values
     summary_text = response.choices[0].message.content.strip()
     decrypted_summary = encryptor.decrypt_text(summary_text)
-    return decrypted_summary
+    
+    # Create a Response object with metadata
+    class Response(str):
+        pass
+        
+    response = Response(decrypted_summary)
+    response.metadata = {
+        "messages": messages,  # 记录发送给 OpenAI 的消息
+        "raw_summary": summary_text,  # 加密的摘要
+        "decrypted_summary": decrypted_summary,  # 解密后的摘要
+        "encrypted_results": encrypted_results,  # 加密后的结果
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 400
+    }
+    
+    return response
