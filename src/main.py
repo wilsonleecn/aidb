@@ -4,7 +4,7 @@
 from openai_sql import generate_statements_from_question, execute_multiple_queries
 from result_summarizer import summarize_sql_result
 
-def process_question(user_question, language):
+def process_question(user_question, language: str = "en"):
     """
     Process a question and return the summary
     """
