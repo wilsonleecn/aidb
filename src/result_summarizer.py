@@ -93,7 +93,6 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
             "content": content_str
         }
     ]
-
     # Make the request to OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",

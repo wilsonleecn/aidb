@@ -2,6 +2,9 @@ import gradio as gr
 import json
 from typing import Dict, Any
 from web_server import process_question
+from chat_logger import ChatLogger
+import uuid
+import os
 
 TRANSLATIONS = {
     "zh": {
@@ -49,6 +52,8 @@ TRANSLATIONS = {
 class SQLChatBot:
     def __init__(self):
         self.current_lang = "en"
+        self.logger = ChatLogger()
+        self.conversation_id = str(uuid.uuid4())
     
     def switch_language(self, lang: str) -> Dict[str, str]:
         """Switch interface language and return new interface text"""
@@ -68,12 +73,51 @@ class SQLChatBot:
     def process_query(self, message: str, history: list) -> tuple:
         """Process user query and return formatted response"""
         try:
+            # 记录用户问题
+            self.logger.add_message(
+                conversation_id=self.conversation_id,
+                content=message,
+                role="user"
+            )
+            
+            # 处理查询
             response = process_question(message)
-            # formatted_response = self.format_response(response)
+            
+            # 记录系统响应
+            self.logger.add_message(
+                conversation_id=self.conversation_id,
+                content=response,
+                role="assistant",
+                metadata={
+                    "language": self.current_lang
+                }
+            )
+            
+            # 每次对话后保存日志
+            log_dir = "chat_logs"
+            os.makedirs(log_dir, exist_ok=True)
+            self.logger.save_to_file(
+                self.conversation_id,
+                f"{log_dir}/conversation_{self.conversation_id}.json"
+            )
+            
             history.append((message, response))
             return history, "", history
+            
         except Exception as e:
             error_msg = TRANSLATIONS[self.current_lang]["error"].format(str(e))
+            
+            # 记录错误
+            self.logger.add_message(
+                conversation_id=self.conversation_id,
+                content=error_msg,
+                role="error",
+                metadata={
+                    "error_type": type(e).__name__,
+                    "error_details": str(e)
+                }
+            )
+            
             history.append((message, error_msg))
             return history, "", history
 
