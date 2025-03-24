@@ -1,21 +1,7 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-import json
 import uuid
-
-@dataclass
-class Message:
-    content: str
-    role: str
-    timestamp: datetime
-    metadata: Dict[str, Any] = None
-
-@dataclass
-class Conversation:
-    conversation_id: str
-    messages: List[Message]
-    metadata: dict
+import json
+from datetime import datetime
+from typing import Optional
 
 class ChatLogger:
     def __init__(self):
@@ -31,8 +17,13 @@ class ChatLogger:
         return conversation_id
             
     def add_message(self, conversation_id: str, content: str, role: str, metadata: Optional[dict] = None):
+        # 如果会话不存在，使用提供的 conversation_id 创建新会话
         if conversation_id not in self.conversations:
-            self.create_conversation()
+            self.conversations[conversation_id] = Conversation(
+                conversation_id=conversation_id,
+                messages=[],
+                metadata={}
+            )
             
         message = Message(
             content=content,
@@ -44,6 +35,9 @@ class ChatLogger:
         self.conversations[conversation_id].messages.append(message)
             
     def save_to_file(self, conversation_id: str, filename: str):
+        if conversation_id not in self.conversations:
+            raise KeyError(f"Conversation {conversation_id} not found")
+            
         conversation = self.conversations[conversation_id]
         data = {
             "conversation_id": conversation.conversation_id,
