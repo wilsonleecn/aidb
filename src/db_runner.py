@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pymysql
-from config_reader import read_db_config
+from config_reader import Config
 
 def run_sql_from_config(sql_str: str, config_path: str):
     """
@@ -15,16 +15,13 @@ def run_sql_from_config(sql_str: str, config_path: str):
     Returns:
         list: The query result, where each row is a dictionary.
     """
-    # Read config using the config_reader module
-    db_conf = read_db_config(config_path)
-
     # Establish the database connection
     connection = pymysql.connect(
-        host=db_conf["host"],
-        port=db_conf["port"],
-        user=db_conf["user"],
-        password=db_conf["password"],
-        database=db_conf["db"],
+        host=Config.DB_HOST,
+        port=Config.DB_PORT,
+        user=Config.DB_USER,
+        password=Config.DB_PASSWORD,
+        database=Config.DB_NAME,
         cursorclass=pymysql.cursors.DictCursor  # Return results as dict
     )
 
