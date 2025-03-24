@@ -1,13 +1,4 @@
-from pathlib import Path
-from dotenv import load_dotenv
 import os
-
-# Get the src directory path
-SRC_DIR = Path(__file__).resolve().parent
-ENV_PATH = SRC_DIR / '.env'
-
-# Load environment variables from .env file
-load_dotenv(dotenv_path=ENV_PATH)
 
 class Config:
     # OpenAI configuration
