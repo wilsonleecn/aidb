@@ -1,7 +1,21 @@
-import uuid
-import json
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional, Dict, Any
+import json
+import uuid
+
+@dataclass
+class Message:
+    content: str
+    role: str
+    timestamp: datetime
+    metadata: Optional[Dict[str, Any]] = None
+
+@dataclass
+class Conversation:
+    conversation_id: str
+    messages: List[Message]
+    metadata: dict
 
 class ChatLogger:
     def __init__(self):
