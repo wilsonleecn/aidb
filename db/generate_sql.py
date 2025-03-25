@@ -44,26 +44,60 @@ def is_ip_address(hostname):
 
 def parse_server_hosts(file_path):
     server_hosts = {}
+    parent_groups = {}  # Maps child groups to their parent group
+    current_group = None
+    current_parent = None
+
     with open(file_path, 'r') as f:
-        current_group = None
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
+            
+            # Check for group headers
             if re.match(r'^\[.*\]$', line):
-                current_group = line.strip('[]')
-                server_hosts[current_group] = []
-            else:
+                group_name = line.strip('[]')
+                
+                # Check if this is a parent group definition
+                if ':children' in group_name:
+                    current_parent = group_name.replace(':children', '')
+                    current_group = None
+                    if current_parent not in server_hosts:
+                        server_hosts[current_parent] = []
+                else:
+                    current_group = group_name
+                    if current_parent:
+                        parent_groups[current_group] = current_parent
+                    if current_group not in server_hosts:
+                        server_hosts[current_group] = []
+            
+            # Process host entries
+            elif current_group:
                 parts = line.split()
                 hostname = parts[0]
                 ip_address = hostname if is_ip_address(hostname) else ''
                 variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
-                server_hosts[current_group].append({
+                
+                # Add the host to its immediate group
+                host_entry = {
                     "hostname": escape_sql(hostname),
                     "ip_address": escape_sql(ip_address),
                     "vars": escape_sql(variables)
-                })
-    return server_hosts
+                }
+                server_hosts[current_group].append(host_entry)
+                
+                # If this group has a parent, add the host to the parent group as well
+                if current_group in parent_groups:
+                    parent = parent_groups[current_group]
+                    server_hosts[parent].append(host_entry)
+
+    # Remove child groups, keeping only parent groups and standalone groups
+    for child in parent_groups:
+        if child in server_hosts:
+            del server_hosts[child]
+
+    # Before returning, we'll add a new field to track parent-child relationships
+    return server_hosts, parent_groups
 
 def parse_service_info(file_path):
     services = {}
@@ -111,14 +145,14 @@ def parse_server_mapping(file_path):
             })
     return server_groups
 
-def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping):
+def generate_sql(domain_name, domain_name_alias_list, server_hosts_data, service_info, server_mapping):
+    server_hosts, parent_groups = server_hosts_data  # Unpack the tuple
     sql_commands = []
     sql_commands.append(f"INSERT INTO Domain (id, name) VALUES (NULL, '{escape_sql(domain_name)}');")
     sql_commands.append(f"SET @domain_id = LAST_INSERT_ID();")
     sql_commands.append(f"SET @id_prefix = @domain_id * 1000;")
     
     # Insert aliases for this domain into ResourceAlias
-    #    resource_type = 'domain', resource_id = @domain_id, alias = each item in domain_name_alias_list
     for alias in domain_name_alias_list:
         sql_commands.append(
             f"INSERT INTO ResourceAlias (resource_type, resource_id, alias) "
@@ -131,7 +165,14 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
     server_host_id_counter = 1
     server_group_mapping_id_counter = 1
     
-    for idx, (group, hosts) in enumerate(server_hosts.items(), start=1):
+    # Filter out child groups before generating SQL
+    parent_groups_set = set(parent_groups.values())
+    filtered_server_hosts = {
+        group: hosts for group, hosts in server_hosts.items()
+        if group not in parent_groups or group in parent_groups_set
+    }
+    
+    for idx, (group, hosts) in enumerate(filtered_server_hosts.items(), start=1):
         host_group_ids[group] = f"(@id_prefix + {idx})"
         sql_commands.append(f"INSERT INTO ServerHostGroup (id, domain_id, name) VALUES ({host_group_ids[group]}, @domain_id, '{group}');")
         for host in hosts:
@@ -159,10 +200,10 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
 def main(folder_path):
     domain_name = os.path.basename(folder_path)
     domain_name_alias_list = get_domain_name_aliases(domain_name)
-    server_hosts = parse_server_hosts(os.path.join(folder_path, 'serverHosts'))
+    server_hosts_data = parse_server_hosts(os.path.join(folder_path, 'serverHosts'))
     service_info = parse_service_info(os.path.join(folder_path, 'serviceInfo.conf'))
     server_mapping = parse_server_mapping(os.path.join(folder_path, 'serverMapping.conf'))
-    sql_statements = generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping)
+    sql_statements = generate_sql(domain_name, domain_name_alias_list, server_hosts_data, service_info, server_mapping)
     
     crrentPath = os.getcwd()
     fileName =  domain_name+'_aid.sql'
