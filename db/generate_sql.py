@@ -54,35 +54,49 @@ def parse_server_hosts(file_path):
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-                
-            if line.startswith('['):
-                group_name = line[1:-1]  # Remove brackets
-                print(f"Debug: Found group: {group_name}")
-                if ':children' in group_name:
-                    parent_group = group_name.replace(':children', '')
-                    is_children_section = True
-                    print(f"Debug: Set parent_group to: {parent_group}")
-                else:
-                    current_group = group_name
-                    if not is_children_section:
-                        parent_group = None
-                    print(f"Debug: Set current_group to: {current_group}")
+
+            if line.endswith(':children'):
+                parent_group = line[1:-10]  # Remove [ and :children]
+                print(f"Debug: Set parent_group to: {parent_group}")
+                is_children_section = True
+                continue
+            elif line.startswith('['):
+                current_group = line[1:-1]  # Remove [ and ]
+                print(f"Debug: Set current_group to: {current_group}")
+                is_children_section = False
                 continue
 
-            group = parent_group if parent_group else current_group
-            if group and line:
-                server_info = line.split()
-                hostname = server_info[0]
-                ip = server_info[1] if len(server_info) > 1 else hostname
-                server_hosts[hostname] = {
-                    'group': group,
-                    'ip': ip
-                }
-                print(f"Debug: Added host {hostname} with group {group} and ip {ip}")
+            if is_children_section:
+                # Handle child groups
+                child_group = line.strip()
+                if parent_group not in server_hosts:
+                    server_hosts[parent_group] = []
+                server_hosts[parent_group].append({
+                    'hostname': child_group,
+                    'group': parent_group,
+                    'ip': child_group
+                })
+                print(f"Debug: Added host {child_group} with group {parent_group} and ip {child_group}")
+            else:
+                # Handle regular hosts
+                parts = line.split()
+                if len(parts) >= 1:
+                    hostname = parts[0]
+                    # Join remaining parts as vars
+                    vars_str = ' '.join(parts[1:]) if len(parts) > 1 else 'ansible_user=root'
+                    
+                    if hostname not in server_hosts:
+                        server_hosts[hostname] = {
+                            'hostname': hostname,
+                            'group': current_group,
+                            'vars': vars_str
+                        }
+                        print(f"Debug: Added host {hostname} with group {current_group} and vars {vars_str}")
 
     print("Debug: Final server_hosts structure:")
     for host, info in server_hosts.items():
         print(f"  {host}: {info}")
+
     return server_hosts
 
 def parse_service_info(file_path):
