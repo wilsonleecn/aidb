@@ -44,25 +44,39 @@ def is_ip_address(hostname):
 
 def parse_server_hosts(file_path):
     server_hosts = {}
+    current_group = None
+    parent_group = None
+    is_children_section = False
+
     with open(file_path, 'r') as f:
-        current_group = None
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            if re.match(r'^\[.*\]$', line):
-                current_group = line.strip('[]')
-                server_hosts[current_group] = []
-            else:
-                parts = line.split()
-                hostname = parts[0]
-                ip_address = hostname if is_ip_address(hostname) else ''
-                variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
-                server_hosts[current_group].append({
-                    "hostname": escape_sql(hostname),
-                    "ip_address": escape_sql(ip_address),
-                    "vars": escape_sql(variables)
-                })
+                
+            if line.startswith('['):
+                group_name = line[1:-1]  # Remove brackets
+                if ':children' in group_name:
+                    # This is a parent group
+                    parent_group = group_name.replace(':children', '')
+                    is_children_section = True
+                else:
+                    # This is a regular group or child group
+                    current_group = group_name
+                    if not is_children_section:
+                        parent_group = None
+                continue
+
+            # When processing hosts, use parent_group if available, otherwise use current_group
+            group = parent_group if parent_group else current_group
+            if group and line:
+                server_info = line.split()
+                server_name = server_info[0]
+                server_hosts[server_name] = {
+                    'group': group,
+                    'ip': server_info[1] if len(server_info) > 1 else server_name
+                }
+
     return server_hosts
 
 def parse_service_info(file_path):
