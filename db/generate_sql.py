@@ -43,6 +43,7 @@ def is_ip_address(hostname):
     return re.match(r'^\d+\.\d+\.\d+\.\d+$', hostname) is not None
 
 def parse_server_hosts(file_path):
+    print("Debug: Starting parse_server_hosts")
     server_hosts = {}
     current_group = None
     parent_group = None
@@ -56,18 +57,18 @@ def parse_server_hosts(file_path):
                 
             if line.startswith('['):
                 group_name = line[1:-1]  # Remove brackets
+                print(f"Debug: Found group: {group_name}")
                 if ':children' in group_name:
-                    # This is a parent group
                     parent_group = group_name.replace(':children', '')
                     is_children_section = True
+                    print(f"Debug: Set parent_group to: {parent_group}")
                 else:
-                    # This is a regular group or child group
                     current_group = group_name
                     if not is_children_section:
                         parent_group = None
+                    print(f"Debug: Set current_group to: {current_group}")
                 continue
 
-            # When processing hosts, use parent_group if available, otherwise use current_group
             group = parent_group if parent_group else current_group
             if group and line:
                 server_info = line.split()
@@ -77,7 +78,11 @@ def parse_server_hosts(file_path):
                     'group': group,
                     'ip': ip
                 }
+                print(f"Debug: Added host {hostname} with group {group} and ip {ip}")
 
+    print("Debug: Final server_hosts structure:")
+    for host, info in server_hosts.items():
+        print(f"  {host}: {info}")
     return server_hosts
 
 def parse_service_info(file_path):
@@ -127,6 +132,11 @@ def parse_server_mapping(file_path):
     return server_groups
 
 def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping):
+    print("Debug: Starting generate_sql")
+    print("Debug: server_hosts content:")
+    for host, info in server_hosts.items():
+        print(f"  {host}: {info}")
+    
     sql_commands = []
     sql_commands.append(f"INSERT INTO Domain (id, name) VALUES (NULL, '{escape_sql(domain_name)}');")
     sql_commands.append(f"SET @domain_id = LAST_INSERT_ID();")
@@ -150,10 +160,21 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
         host_group_ids[group] = f"(@id_prefix + {idx})"
         sql_commands.append(f"INSERT INTO ServerHostGroup (id, domain_id, name) VALUES ({host_group_ids[group]}, @domain_id, '{group}');")
         for hostname, host_info in hosts.items():
-            group = host_info['group']
-            ip = host_info['ip']
-            # Use empty JSON object as default vars if none specified
-            vars_json = '{}' 
+            print(f"Debug: Processing host {hostname}, info: {host_info}, type: {type(host_info)}")
+            
+            if not isinstance(host_info, dict):
+                print(f"Warning: host_info is not a dictionary for {hostname}")
+                continue
+            
+            try:
+                group = host_info['group']
+                ip = host_info['ip']
+            except (KeyError, TypeError) as e:
+                print(f"Error processing host {hostname}: {e}")
+                print(f"host_info content: {host_info}")
+                continue
+
+            vars_json = '{}'
             
             sql_commands.append(f"INSERT INTO ServerHost (id, domain_id, hostname, ip_address, server_host_group_id, vars) "
                               f"VALUES (@id_prefix + {server_host_id_counter}, @domain_id, '{hostname}', '{ip}', "
