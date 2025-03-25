@@ -96,7 +96,8 @@ def parse_server_hosts(file_path):
         if child in server_hosts:
             del server_hosts[child]
 
-    return server_hosts
+    # Before returning, we'll add a new field to track parent-child relationships
+    return server_hosts, parent_groups
 
 def parse_service_info(file_path):
     services = {}
@@ -144,14 +145,14 @@ def parse_server_mapping(file_path):
             })
     return server_groups
 
-def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping):
+def generate_sql(domain_name, domain_name_alias_list, server_hosts_data, service_info, server_mapping):
+    server_hosts, parent_groups = server_hosts_data  # Unpack the tuple
     sql_commands = []
     sql_commands.append(f"INSERT INTO Domain (id, name) VALUES (NULL, '{escape_sql(domain_name)}');")
     sql_commands.append(f"SET @domain_id = LAST_INSERT_ID();")
     sql_commands.append(f"SET @id_prefix = @domain_id * 1000;")
     
     # Insert aliases for this domain into ResourceAlias
-    #    resource_type = 'domain', resource_id = @domain_id, alias = each item in domain_name_alias_list
     for alias in domain_name_alias_list:
         sql_commands.append(
             f"INSERT INTO ResourceAlias (resource_type, resource_id, alias) "
@@ -164,7 +165,14 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
     server_host_id_counter = 1
     server_group_mapping_id_counter = 1
     
-    for idx, (group, hosts) in enumerate(server_hosts.items(), start=1):
+    # Filter out child groups before generating SQL
+    parent_groups_set = set(parent_groups.values())
+    filtered_server_hosts = {
+        group: hosts for group, hosts in server_hosts.items()
+        if group not in parent_groups or group in parent_groups_set
+    }
+    
+    for idx, (group, hosts) in enumerate(filtered_server_hosts.items(), start=1):
         host_group_ids[group] = f"(@id_prefix + {idx})"
         sql_commands.append(f"INSERT INTO ServerHostGroup (id, domain_id, name) VALUES ({host_group_ids[group]}, @domain_id, '{group}');")
         for host in hosts:
@@ -192,10 +200,10 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
 def main(folder_path):
     domain_name = os.path.basename(folder_path)
     domain_name_alias_list = get_domain_name_aliases(domain_name)
-    server_hosts = parse_server_hosts(os.path.join(folder_path, 'serverHosts'))
+    server_hosts_data = parse_server_hosts(os.path.join(folder_path, 'serverHosts'))
     service_info = parse_service_info(os.path.join(folder_path, 'serviceInfo.conf'))
     server_mapping = parse_server_mapping(os.path.join(folder_path, 'serverMapping.conf'))
-    sql_statements = generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping)
+    sql_statements = generate_sql(domain_name, domain_name_alias_list, server_hosts_data, service_info, server_mapping)
     
     crrentPath = os.getcwd()
     fileName =  domain_name+'_aid.sql'
