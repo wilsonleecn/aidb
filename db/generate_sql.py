@@ -43,7 +43,6 @@ def is_ip_address(hostname):
     return re.match(r'^\d+\.\d+\.\d+\.\d+$', hostname) is not None
 
 def parse_server_hosts(file_path):
-    print("Debug: Starting parse_server_hosts")
     server_hosts = {}
     current_group = None
     parent_group = None
@@ -57,12 +56,10 @@ def parse_server_hosts(file_path):
 
             if line.endswith(':children'):
                 parent_group = line[1:-10]  # Remove [ and :children]
-                print(f"Debug: Set parent_group to: {parent_group}")
                 is_children_section = True
                 continue
             elif line.startswith('['):
                 current_group = line[1:-1]  # Remove [ and ]
-                print(f"Debug: Set current_group to: {current_group}")
                 is_children_section = False
                 continue
 
@@ -76,7 +73,6 @@ def parse_server_hosts(file_path):
                     'group': parent_group,
                     'ip': child_group
                 })
-                print(f"Debug: Added host {child_group} with group {parent_group} and ip {child_group}")
             else:
                 # Handle regular hosts
                 parts = line.split()
@@ -91,11 +87,6 @@ def parse_server_hosts(file_path):
                             'group': current_group,
                             'vars': vars_str
                         }
-                        print(f"Debug: Added host {hostname} with group {current_group} and vars {vars_str}")
-
-    print("Debug: Final server_hosts structure:")
-    for host, info in server_hosts.items():
-        print(f"  {host}: {info}")
 
     return server_hosts
 
