@@ -148,8 +148,15 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
     for idx, (group, hosts) in enumerate(server_hosts.items(), start=1):
         host_group_ids[group] = f"(@id_prefix + {idx})"
         sql_commands.append(f"INSERT INTO ServerHostGroup (id, domain_id, name) VALUES ({host_group_ids[group]}, @domain_id, '{group}');")
-        for host in hosts:
-            sql_commands.append(f"INSERT INTO ServerHost (id, domain_id, hostname, ip_address, server_host_group_id, vars) VALUES (@id_prefix + {server_host_id_counter}, @domain_id, '{host['hostname']}', '{host['ip_address']}', {host_group_ids[group]}, '{host['vars']}');")
+        for hostname, host_info in hosts.items():
+            group = host_info['group']
+            ip = host_info['ip']
+            # Use empty JSON object as default vars if none specified
+            vars_json = '{}' 
+            
+            sql_commands.append(f"INSERT INTO ServerHost (id, domain_id, hostname, ip_address, server_host_group_id, vars) "
+                              f"VALUES (@id_prefix + {server_host_id_counter}, @domain_id, '{hostname}', '{ip}', "
+                              f"{host_group_ids[group]}, '{vars_json}');")
             server_host_id_counter += 1
     
     for idx, (service, info) in enumerate(service_info.items(), start=1):
