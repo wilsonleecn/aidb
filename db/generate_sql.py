@@ -44,50 +44,25 @@ def is_ip_address(hostname):
 
 def parse_server_hosts(file_path):
     server_hosts = {}
-    current_group = None
-    parent_group = None
-    is_children_section = False
-
     with open(file_path, 'r') as f:
+        current_group = None
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-
-            if line.endswith(':children'):
-                parent_group = line[1:-10]  # Remove [ and :children]
-                is_children_section = True
-                continue
-            elif line.startswith('['):
-                current_group = line[1:-1]  # Remove [ and ]
-                is_children_section = False
-                continue
-
-            if is_children_section:
-                # Handle child groups
-                child_group = line.strip()
-                if parent_group not in server_hosts:
-                    server_hosts[parent_group] = []
-                server_hosts[parent_group].append({
-                    'hostname': child_group,
-                    'group': parent_group,
-                    'ip': child_group
-                })
+            if re.match(r'^\[.*\]$', line):
+                current_group = line.strip('[]')
+                server_hosts[current_group] = []
             else:
-                # Handle regular hosts
                 parts = line.split()
-                if len(parts) >= 1:
-                    hostname = parts[0]
-                    # Join remaining parts as vars
-                    vars_str = ' '.join(parts[1:]) if len(parts) > 1 else 'ansible_user=root'
-                    
-                    if hostname not in server_hosts:
-                        server_hosts[hostname] = {
-                            'hostname': hostname,
-                            'group': current_group,
-                            'vars': vars_str
-                        }
-
+                hostname = parts[0]
+                ip_address = hostname if is_ip_address(hostname) else ''
+                variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
+                server_hosts[current_group].append({
+                    "hostname": escape_sql(hostname),
+                    "ip_address": escape_sql(ip_address),
+                    "vars": escape_sql(variables)
+                })
     return server_hosts
 
 def parse_service_info(file_path):
@@ -137,11 +112,6 @@ def parse_server_mapping(file_path):
     return server_groups
 
 def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info, server_mapping):
-    print("Debug: Starting generate_sql")
-    print("Debug: server_hosts content:")
-    for host, info in server_hosts.items():
-        print(f"  {host}: {info}")
-    
     sql_commands = []
     sql_commands.append(f"INSERT INTO Domain (id, name) VALUES (NULL, '{escape_sql(domain_name)}');")
     sql_commands.append(f"SET @domain_id = LAST_INSERT_ID();")
@@ -164,26 +134,8 @@ def generate_sql(domain_name, domain_name_alias_list, server_hosts, service_info
     for idx, (group, hosts) in enumerate(server_hosts.items(), start=1):
         host_group_ids[group] = f"(@id_prefix + {idx})"
         sql_commands.append(f"INSERT INTO ServerHostGroup (id, domain_id, name) VALUES ({host_group_ids[group]}, @domain_id, '{group}');")
-        for hostname, host_info in hosts.items():
-            print(f"Debug: Processing host {hostname}, info: {host_info}, type: {type(host_info)}")
-            
-            if not isinstance(host_info, dict):
-                print(f"Warning: host_info is not a dictionary for {hostname}")
-                continue
-            
-            try:
-                group = host_info['group']
-                ip = host_info['ip']
-            except (KeyError, TypeError) as e:
-                print(f"Error processing host {hostname}: {e}")
-                print(f"host_info content: {host_info}")
-                continue
-
-            vars_json = '{}'
-            
-            sql_commands.append(f"INSERT INTO ServerHost (id, domain_id, hostname, ip_address, server_host_group_id, vars) "
-                              f"VALUES (@id_prefix + {server_host_id_counter}, @domain_id, '{hostname}', '{ip}', "
-                              f"{host_group_ids[group]}, '{vars_json}');")
+        for host in hosts:
+            sql_commands.append(f"INSERT INTO ServerHost (id, domain_id, hostname, ip_address, server_host_group_id, vars) VALUES (@id_prefix + {server_host_id_counter}, @domain_id, '{host['hostname']}', '{host['ip_address']}', {host_group_ids[group]}, '{host['vars']}');")
             server_host_id_counter += 1
     
     for idx, (service, info) in enumerate(service_info.items(), start=1):
