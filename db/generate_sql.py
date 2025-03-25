@@ -44,59 +44,52 @@ def is_ip_address(hostname):
 
 def parse_server_hosts(file_path):
     server_hosts = {}
-    parent_groups = {}  # Track parent-child relationships
+    parent_groups = {}  # Maps child groups to their parent group
     current_group = None
-    is_children_section = False
+    current_parent = None
 
     with open(file_path, 'r') as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-
+            
             # Check for group headers
             if re.match(r'^\[.*\]$', line):
                 group_name = line.strip('[]')
+                
+                # Check if this is a parent group definition
                 if ':children' in group_name:
-                    # This is a parent group definition
-                    parent_name = group_name.replace(':children', '')
-                    is_children_section = True
-                    current_group = parent_name
-                    if parent_name not in server_hosts:
-                        server_hosts[parent_name] = []
+                    current_parent = group_name.replace(':children', '')
+                    current_group = None
+                    if current_parent not in server_hosts:
+                        server_hosts[current_parent] = []
                 else:
-                    # This is a regular group or child group
-                    is_children_section = False
                     current_group = group_name
+                    if current_parent:
+                        parent_groups[current_group] = current_parent
                     if current_group not in server_hosts:
                         server_hosts[current_group] = []
-            else:
-                if is_children_section:
-                    # This is a child group name, store the parent relationship
-                    child_group = line.strip()
-                    parent_groups[child_group] = current_group
-                else:
-                    # This is a host definition
-                    parts = line.split()
-                    hostname = parts[0]
-                    ip_address = hostname if is_ip_address(hostname) else ''
-                    variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
-                    
-                    # Add the host to its immediate group
-                    server_hosts[current_group].append({
-                        "hostname": escape_sql(hostname),
-                        "ip_address": escape_sql(ip_address),
-                        "vars": escape_sql(variables)
-                    })
-                    
-                    # If this group is a child, also add the host to the parent group
-                    if current_group in parent_groups:
-                        parent = parent_groups[current_group]
-                        server_hosts[parent].append({
-                            "hostname": escape_sql(hostname),
-                            "ip_address": escape_sql(ip_address),
-                            "vars": escape_sql(variables)
-                        })
+            
+            # Process host entries
+            elif current_group:
+                parts = line.split()
+                hostname = parts[0]
+                ip_address = hostname if is_ip_address(hostname) else ''
+                variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
+                
+                # Add the host to its immediate group
+                host_entry = {
+                    "hostname": escape_sql(hostname),
+                    "ip_address": escape_sql(ip_address),
+                    "vars": escape_sql(variables)
+                }
+                server_hosts[current_group].append(host_entry)
+                
+                # If this group has a parent, add the host to the parent group as well
+                if current_group in parent_groups:
+                    parent = parent_groups[current_group]
+                    server_hosts[parent].append(host_entry)
 
     # Remove child groups, keeping only parent groups and standalone groups
     for child in parent_groups:
