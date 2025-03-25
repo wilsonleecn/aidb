@@ -71,10 +71,11 @@ def parse_server_hosts(file_path):
             group = parent_group if parent_group else current_group
             if group and line:
                 server_info = line.split()
-                server_name = server_info[0]
-                server_hosts[server_name] = {
+                hostname = server_info[0]
+                ip = server_info[1] if len(server_info) > 1 else hostname
+                server_hosts[hostname] = {
                     'group': group,
-                    'ip': server_info[1] if len(server_info) > 1 else server_name
+                    'ip': ip
                 }
 
     return server_hosts
