@@ -104,6 +104,7 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
         "raw_summary": summary_text,  # 加密的摘要
         "decrypted_summary": decrypted_summary,  # 解密后的摘要
         "encrypted_results": encrypted_results,  # 加密后的结果
+        "value_map": encryptor.value_map,  # 添加 encryptor 的映射关系
         "model": "gpt-3.5-turbo",
         "temperature": 0.7,
         "max_tokens": 400
