@@ -18,22 +18,22 @@ class ValueEncryptor:
     def encrypt_value(self, value: Any) -> str:
         # Convert value to string and create a hash
         value_str = str(value)
-        # Use a combination of counter and value to ensure uniqueness
-        hash_input = value_str + str(len(self.value_map))
-        # Create a short hash using first 8 bytes
-        hash_obj = hashlib.sha256(hash_input.encode('utf-8'))
-        # Use base64 to create a URL-safe string
-        placeholder = f"ENC_{base64.urlsafe_b64encode(hash_obj.digest()[:8]).decode('utf-8')}"
-        # Store the mapping
-        self.value_map[placeholder] = value
+        # Create a hash of the value
+        hash_obj = hashlib.sha256(value_str.encode('utf-8'))
+        # Take first 6 characters of hex digest
+        hash_str = hash_obj.hexdigest()[:6]
+        # Create a placeholder with a clear format
+        placeholder = f"<VAL_{hash_str}>"
+        # Store the mapping if it's a new value
+        if placeholder not in self.value_map:
+            self.value_map[placeholder] = value
         return placeholder
     
     def decrypt_text(self, text: str) -> str:
-        # Sort placeholders by length in descending order to avoid partial matches
-        placeholders = sorted(self.value_map.keys(), key=len, reverse=True)
+        # No need to sort as placeholders have fixed format and won't conflict
         result = text
-        for placeholder in placeholders:
-            result = result.replace(placeholder, str(self.value_map[placeholder]))
+        for placeholder, value in self.value_map.items():
+            result = result.replace(placeholder, str(value))
         return result
 
 def encrypt_results(results: List[dict], encryptor: ValueEncryptor) -> List[dict]:
