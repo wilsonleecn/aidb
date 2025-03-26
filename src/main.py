@@ -29,7 +29,7 @@ def process_question(user_question, language: str = "en"):
         
         # append query results to summary
         results_section = "\n\nRaw Results:\n"
-        for i, result in enumerate(all_results):
+        for i, result in enumerate(all_results.result):
             results_section += f"\n[Query {i+1}]:\n"
             if isinstance(result, list):
                 for row in result:
@@ -37,7 +37,7 @@ def process_question(user_question, language: str = "en"):
             else:
                 results_section += f"{result}\n"
         
-        summary = results_section + summary
+        summary = summary + "\n\nRaw Results:\n" + results_section
         
         # update metadata 
         metadata.update({
