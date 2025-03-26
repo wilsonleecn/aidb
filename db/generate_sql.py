@@ -97,22 +97,26 @@ def parse_server_hosts(file_path):
 
     # Second pass: propagate hosts from child groups to parent groups
     for parent, children in children_groups.items():
+        all_hosts = []
+        # Collect hosts from all child groups
         for child in children:
             if child in server_hosts:
-                server_hosts[parent].extend(server_hosts[child])
+                all_hosts.extend(server_hosts[child])
+        
+        # Add collected hosts to parent group
+        if parent not in server_hosts:
+            server_hosts[parent] = []
+        server_hosts[parent].extend(all_hosts)
 
-    # Remove duplicate entries in parent groups
-    for parent in children_groups:
-        if parent in server_hosts:
-            # Use a set of hostnames to track uniqueness
-            seen_hosts = set()
-            unique_hosts = []
-            for host in server_hosts[parent]:
-                host_key = (host['hostname'], host['ip_address'], host['vars'])
-                if host_key not in seen_hosts:
-                    seen_hosts.add(host_key)
-                    unique_hosts.append(host)
-            server_hosts[parent] = unique_hosts
+        # Remove duplicates while preserving order
+        seen_hosts = set()
+        unique_hosts = []
+        for host in server_hosts[parent]:
+            host_key = (host['hostname'], host['ip_address'], host['vars'])
+            if host_key not in seen_hosts:
+                seen_hosts.add(host_key)
+                unique_hosts.append(host)
+        server_hosts[parent] = unique_hosts
 
     return server_hosts, parent_groups
 
