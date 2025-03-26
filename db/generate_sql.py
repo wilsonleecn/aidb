@@ -45,9 +45,11 @@ def is_ip_address(hostname):
 def parse_server_hosts(file_path):
     server_hosts = {}
     parent_groups = {}  # Maps child groups to their parent group
+    children_groups = {}  # Maps parent groups to their child groups
     current_group = None
     current_parent = None
 
+    # First pass: collect all groups and their relationships
     with open(file_path, 'r') as f:
         for line in f:
             line = line.strip()
@@ -60,16 +62,24 @@ def parse_server_hosts(file_path):
                 
                 # Check if this is a parent group definition
                 if ':children' in group_name:
-                    current_parent = group_name.replace(':children', '')
+                    parent_name = group_name.replace(':children', '')
+                    current_parent = parent_name
                     current_group = None
+                    if current_parent not in children_groups:
+                        children_groups[current_parent] = []
                     if current_parent not in server_hosts:
                         server_hosts[current_parent] = []
                 else:
                     current_group = group_name
-                    if current_parent:
-                        parent_groups[current_group] = current_parent
+                    current_parent = None
                     if current_group not in server_hosts:
                         server_hosts[current_group] = []
+            
+            # If we're in a parent group definition, record child groups
+            elif current_parent and line:
+                child_group = line.strip()
+                children_groups[current_parent].append(child_group)
+                parent_groups[child_group] = current_parent
             
             # Process host entries
             elif current_group:
@@ -78,25 +88,32 @@ def parse_server_hosts(file_path):
                 ip_address = hostname if is_ip_address(hostname) else ''
                 variables = ' '.join(parts[1:]) if len(parts) > 1 else ''
                 
-                # Add the host to its immediate group
                 host_entry = {
                     "hostname": escape_sql(hostname),
                     "ip_address": escape_sql(ip_address),
                     "vars": escape_sql(variables)
                 }
                 server_hosts[current_group].append(host_entry)
-                
-                # If this group has a parent, add the host to the parent group as well
-                if current_group in parent_groups:
-                    parent = parent_groups[current_group]
-                    server_hosts[parent].append(host_entry)
 
-    # Remove child groups, keeping only parent groups and standalone groups
-    for child in parent_groups:
-        if child in server_hosts:
-            del server_hosts[child]
+    # Second pass: propagate hosts from child groups to parent groups
+    for parent, children in children_groups.items():
+        for child in children:
+            if child in server_hosts:
+                server_hosts[parent].extend(server_hosts[child])
 
-    # Before returning, we'll add a new field to track parent-child relationships
+    # Remove duplicate entries in parent groups
+    for parent in children_groups:
+        if parent in server_hosts:
+            # Use a set of hostnames to track uniqueness
+            seen_hosts = set()
+            unique_hosts = []
+            for host in server_hosts[parent]:
+                host_key = (host['hostname'], host['ip_address'], host['vars'])
+                if host_key not in seen_hosts:
+                    seen_hosts.add(host_key)
+                    unique_hosts.append(host)
+            server_hosts[parent] = unique_hosts
+
     return server_hosts, parent_groups
 
 def parse_service_info(file_path):
