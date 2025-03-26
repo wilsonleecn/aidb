@@ -14,21 +14,26 @@ client = OpenAI(api_key=Config.OPENAI_API_KEY)
 class ValueEncryptor:
     def __init__(self):
         self.value_map: Dict[str, Any] = {}
-        self._counter = 0
     
     def encrypt_value(self, value: Any) -> str:
-        # Generate a unique placeholder
-        placeholder = f"ENCRYPTED_{self._counter}"
-        self._counter += 1
+        # Convert value to string and create a hash
+        value_str = str(value)
+        # Use a combination of counter and value to ensure uniqueness
+        hash_input = value_str + str(len(self.value_map))
+        # Create a short hash using first 8 bytes
+        hash_obj = hashlib.sha256(hash_input.encode('utf-8'))
+        # Use base64 to create a URL-safe string
+        placeholder = f"ENC_{base64.urlsafe_b64encode(hash_obj.digest()[:8]).decode('utf-8')}"
         # Store the mapping
         self.value_map[placeholder] = value
         return placeholder
     
     def decrypt_text(self, text: str) -> str:
-        # Replace all placeholders in the text with their original values
+        # Sort placeholders by length in descending order to avoid partial matches
+        placeholders = sorted(self.value_map.keys(), key=len, reverse=True)
         result = text
-        for placeholder, value in self.value_map.items():
-            result = result.replace(placeholder, str(value))
+        for placeholder in placeholders:
+            result = result.replace(placeholder, str(self.value_map[placeholder]))
         return result
 
 def encrypt_results(results: List[dict], encryptor: ValueEncryptor) -> List[dict]:
