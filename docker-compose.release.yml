@@ -28,10 +28,7 @@ services:
       - .env
     volumes:
       - ./src:/home/work/aidb
-    # ports:
-    #   - "5000:5000"
-    # Keep container alive with tail -f /dev/null if no other command is needed
-    command: tail -f /dev/null
-    # Alternatively, uncomment one of these if you need to run a specific service:
+    ports:
+      - "5000:5000"
     # command: python web_server.py
-    # command: python gradio_chat.py
+    command: python gradio_chat.py
