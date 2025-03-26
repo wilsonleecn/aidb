@@ -28,16 +28,16 @@ def process_question(user_question, language: str = "en"):
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
         # append query results to summary
-        results_section = "\n\nQuery Results:\n"
+        results_section = "\n\nRaw Results:\n"
         for i, result in enumerate(all_results):
-            results_section += f"\nQuery {i+1} Results:\n"
+            results_section += f"\n[Query {i+1}]:\n"
             if isinstance(result, list):
                 for row in result:
                     results_section += f"{row}\n"
             else:
                 results_section += f"{result}\n"
         
-        summary = summary + results_section
+        summary = results_section + summary
         
         # update metadata 
         metadata.update({
