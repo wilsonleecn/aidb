@@ -29,15 +29,19 @@ def process_question(user_question, language: str = "en"):
         
         # append query results to summary
         results_section = "\n\nRaw Results:\n"
-        for i, result in enumerate(all_results.result):
+        for i, result in enumerate(all_results):
             results_section += f"\n[Query {i+1}]:\n"
             if isinstance(result, list):
                 for row in result:
                     results_section += f"{row}\n"
             else:
-                results_section += f"{result}\n"
+                if isinstance(result['result'], list):
+                    for item in result['result']:
+                        results_section += f"{item}\n"
+                else:
+                    results_section += f"{result['result']}\n"
         
-        summary = summary + "\n\nRaw Results:\n" + results_section
+        summary = summary + results_section
         
         # update metadata 
         metadata.update({
