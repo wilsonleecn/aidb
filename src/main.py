@@ -28,7 +28,7 @@ def process_question(user_question, language: str = "en"):
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
         # append query results to summary
-        results_section = "\n\nRaw Results:\n"
+        results_section = "\n\n----Raw Results----"
         for i, result in enumerate(all_results):
             results_section += f"\n[Query {i+1}]:\n"
             if isinstance(result, list):
