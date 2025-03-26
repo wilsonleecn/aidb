@@ -27,6 +27,18 @@ def process_question(user_question, language: str = "en"):
         # generate summary
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
+        # append query results to summary
+        results_section = "\n\nQuery Results:\n"
+        for i, result in enumerate(all_results):
+            results_section += f"\nQuery {i+1} Results:\n"
+            if isinstance(result, list):
+                for row in result:
+                    results_section += f"{row}\n"
+            else:
+                results_section += f"{result}\n"
+        
+        summary = summary + results_section
+        
         # update metadata 
         metadata.update({
             "end_time": datetime.now().isoformat(),

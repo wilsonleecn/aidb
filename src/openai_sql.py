@@ -82,6 +82,14 @@ You are an AI assistant that generates SQL queries based on the following schema
 Use only the information in the schema to answer questions.
 Provide only the SQL query (or queries) that fulfill the user's request.
 Do not provide explanations—only the SQL.
+
+When querying server information, always include:
+- The server's hostname
+- The server's IP address
+- The server host group name
+- The domain name
+
+For server queries, use appropriate JOINs between ServerHost, ServerHostGroup, and Domain tables.
 """
 
 def generate_statements_from_question(user_question: str) -> list:
