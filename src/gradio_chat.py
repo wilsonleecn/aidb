@@ -154,34 +154,27 @@ def create_interface():
     .language-selector {
         text-align: right;
     }
-    /* Remove all borders, padding and margins from radio group */
-    .language-selector .gr-form {
+    /* Target the fieldset directly and remove its styling */
+    .language-selector fieldset {
         border: none !important;
-        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        min-width: unset !important;
+        overflow: visible !important;
+        background: none !important;
     }
-    .language-selector .gr-radio-row {
+    /* Hide the absolute positioned wrap */
+    .language-selector fieldset > .wrap.default {
+        display: none !important;
+    }
+    /* Hide the block-info span */
+    .language-selector fieldset > span[data-testid="block-info"] {
+        display: none !important;
+    }
+    /* Style the actual radio buttons wrap */
+    .language-selector .wrap.svelte-1kzox3m {
+        display: flex !important;
         gap: 0.5em !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    .language-selector .gr-form > div:first-child,
-    .language-selector .gr-form > div.wrap {
-        border: none !important;
-        background: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    .language-selector .gr-radio-row > div {
-        margin: 0 !important;
-    }
-    .language-selector .gr-block.gr-box {
-        border: none !important;
-        background: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
     }
     """
     
