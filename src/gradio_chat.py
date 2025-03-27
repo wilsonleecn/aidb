@@ -137,11 +137,11 @@ def create_interface():
     
     /* Dark mode styles */
     body {
-        # background-color: #000000 !important;
+        background-color: #000000 !important;
         color: #ffffff !important;
     }
     .gradio-container {
-        background-color: #000000 !important;
+        # background-color: #000000 !important;
     }
     .chat-message {
         background-color: #1a1a1a !important;
