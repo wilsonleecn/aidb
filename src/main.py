@@ -28,20 +28,29 @@ def process_question(user_question, language: str = "en"):
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
         # append query results to summary
+        show_raw_results = False
+        result_limit = 10  # Configure the threshold here
+        
         raw_results_section = "\n\n----Raw Results----"
         for i, result in enumerate(all_results):
             raw_results_section += f"\n[Query {i+1}]:\n"
             if isinstance(result, list):
+                if len(result) > result_limit:
+                    show_raw_results = True
                 for row in result:
                     raw_results_section += f"{row}\n"
             else:
                 if isinstance(result['result'], list):
+                    if len(result['result']) > result_limit:
+                        show_raw_results = True
                     for item in result['result']:
                         raw_results_section += f"{item}\n"
                 else:
                     raw_results_section += f"{result['result']}\n"
         
-        # summary = summary + raw_results_section
+        # Only append raw results if there are more items than the limit in any result
+        if show_raw_results:
+            summary = summary + raw_results_section
         
         # update metadata 
         metadata.update({
