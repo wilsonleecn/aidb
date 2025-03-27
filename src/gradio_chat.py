@@ -19,7 +19,7 @@ TRANSLATIONS = {
         "examples": [
             "How many domains do we have?",
             "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
-            "In dev1, how many servers are running the configportal service?",
+            "In dev1, how many servers are running the configportal service? please list all of them",
             "172.16.97.128是什么server",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "dev1里面有多少个server运行Logserver服务，请列出ip",
@@ -40,7 +40,7 @@ TRANSLATIONS = {
         "examples": [
             "How many domains do we have?",
             "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
-            "In dev1, how many servers are running the configportal service?",
+            "In dev1, how many servers are running the configportal service? please list all of them",
             "172.16.97.128是什么server",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "dev1里面有多少个server运行Logserver服务，请列出ip",
