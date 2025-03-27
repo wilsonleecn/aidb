@@ -150,9 +150,20 @@ def create_interface():
     .chat-message.user {
         background-color: #2a2a2a !important;
     }
-    /* Add styles for language selector */
+    /* Language selector styles */
     .language-selector {
         text-align: right;
+    }
+    /* Remove radio border and label */
+    .language-selector .gr-form {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .language-selector .gr-radio-row {
+        gap: 0.5em !important;
+    }
+    .language-selector .gr-form > div:first-child {
+        display: none !important;  /* Hide the label */
     }
     """
     
@@ -164,7 +175,7 @@ def create_interface():
                 language_radio = gr.Radio(
                     choices=["English", "中文"],
                     value="English",
-                    label="Language",
+                    label="",  # Remove the label
                     interactive=True
                 )
         
