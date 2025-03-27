@@ -176,18 +176,7 @@ def create_interface():
         display: flex !important;
         gap: 0.5em !important;
         justify-content: flex-end !important;
-        background: transparent !important;
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    /* Override any potential background colors */
-    .language-selector .wrap.svelte-1kzox3m,
-    .language-selector .wrap.svelte-1kzox3m::before,
-    .language-selector .wrap.svelte-1kzox3m::after {
-        background: transparent !important;
-        background-color: transparent !important;
-        background-image: none !important;
+        background-color: var(--bg-dark) !important;
     }
     """
     
