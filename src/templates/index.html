@@ -11,7 +11,7 @@
 
             /* Add or update these lines */
             background-color: #000000; /* sets the background to black */
-            color: #ffffff;           /* sets the text color to white, so it’s visible */
+            color: #ffffff;           /* sets the text color to white, so it's visible */
         }
         .container {
             margin-top: 20px;
@@ -51,9 +51,9 @@
             margin-top: 10px;
         }
         .language-selector {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            float: right;
+            margin-top: 20px;
+            display: inline-block;
         }
         .language-btn {
             padding: 5px 10px;
@@ -71,12 +71,13 @@
     </style>
 </head>
 <body>
-    <div class="language-selector">
-        <button class="language-btn active" onclick="switchLanguage('en')" data-lang="en">English</button>
-        <button class="language-btn" onclick="switchLanguage('zh')" data-lang="zh">中文</button>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 data-i18n="title">AI DevOps Assistant</h1>
+        <div class="language-selector">
+            <button class="language-btn active" onclick="switchLanguage('en')" data-lang="en">English</button>
+            <button class="language-btn" onclick="switchLanguage('zh')" data-lang="zh">中文</button>
+        </div>
     </div>
-
-    <h1 data-i18n="title">AI DevOps Assistant</h1>
     
     <div class="help-text">
         <h3 data-i18n="howToUseTitle">How to use:</h3>
