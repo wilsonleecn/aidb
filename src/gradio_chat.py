@@ -154,6 +154,7 @@ def create_interface():
     .language-selector {
         text-align: right;
         min-width: 180px !important;
+        background-color: transparent;
     }
     /* Target the form div */
     .language-selector .form.svelte-sfqy0y {
