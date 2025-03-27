@@ -155,8 +155,12 @@ def create_interface():
         # Chat interface
         chatbot = gr.Chatbot(
             height=400,
-            avatar_images=("👤", "🤖")
+            avatar_images=(
+                "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f464.svg",  # 用户头像 👤
+                "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f916.svg"   # 机器人头像 🤖
+            )
         )
+
         msg = gr.Textbox(
             placeholder=TRANSLATIONS['en']['description'],
             show_label=False
