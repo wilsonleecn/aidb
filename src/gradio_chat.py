@@ -9,7 +9,7 @@ from datetime import datetime
 
 TRANSLATIONS = {
     "zh": {
-        "title": "DevOoops查询助手",
+        "title": "DevOoops查询助手 v1.0",
         "description": "👋 你好！我是你的DevOps助手。请输入你关于各个Domain Server相关问题，我会帮你查询并解释结果。\n\n⚠️ 注意：目前仅支持简单的一问一答模式，不支持上下文关联的对话。",
         "language": "语言选择",
         "clear_btn": "清空对话",
@@ -30,7 +30,7 @@ TRANSLATIONS = {
         "placeholder": "在这里输入你的问题..."
     },
     "en": {
-        "title": "DevOoops Assistant",
+        "title": "DevOoops Assistant v1.0",
         "description": "👋 Hi! I'm your DevOps assistant. Please enter your question about domain and server, and I'll help you query and explain the results.\n\n⚠️ Note: Currently only supports simple Q&A mode, context-aware conversations are not supported.",
         "language": "Language",
         "clear_btn": "Clear Chat",
