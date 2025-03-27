@@ -18,11 +18,11 @@ TRANSLATIONS = {
         "error": "抱歉，处理您的请求时出现错误: {}",
         "examples": [
             "How many domains do we have?",
-           "172.16.97.128是什么server",
+            "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
             "In dev1, how many servers are running the configportal service?",
+            "172.16.97.128是什么server",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "dev1里面有多少个server运行Logserver服务，请列出ip",
-            "Please list all the server IPs and their servergroup running the logserver service in domain dev2."
         ],
         "sql_section": "执行的SQL语句：",
         "result_section": "查询结果：",
@@ -39,11 +39,11 @@ TRANSLATIONS = {
         "error": "Sorry, an error occurred: {}",
         "examples": [
             "How many domains do we have?",
-           "172.16.97.128是什么server",
+            "Please list all the server IPs and their servergroup running the logserver service in domain dev2.",
             "In dev1, how many servers are running the configportal service?",
+            "172.16.97.128是什么server",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
-            "dev1里面有多少个server 运行Logserver服务，请列出ip",
-            "Please list all the server IPs and their servergroup running the logserver service in domain dev2."
+            "dev1里面有多少个server运行Logserver服务，请列出ip",
         ],
         "sql_section": "Executed SQL:",
         "result_section": "Query Results:",
