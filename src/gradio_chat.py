@@ -154,16 +154,27 @@ def create_interface():
     .language-selector {
         text-align: right;
     }
-    /* Remove radio border and label */
+    /* Remove all borders, padding and margins from radio group */
     .language-selector .gr-form {
         border: none !important;
         box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     .language-selector .gr-radio-row {
         gap: 0.5em !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
-    .language-selector .gr-form > div:first-child {
-        display: none !important;  /* Hide the label */
+    .language-selector .gr-form > div:first-child,
+    .language-selector .gr-form > div.wrap,
+    .language-selector .gr-block.gr-box {
+        display: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .language-selector .gr-radio-row > div {
+        margin: 0 !important;
     }
     """
     
