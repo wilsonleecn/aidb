@@ -155,10 +155,7 @@ def create_interface():
         # Chat interface
         chatbot = gr.Chatbot(
             height=400,
-            avatar_images=("👤", "🤖"),  # (user_avatar, assistant_avatar)
-            # 或者使用图片URL:
-            # avatar_images=("path/to/user.png", "path/to/bot.png"),
-            names=("User", "DevOoops")
+            avatar_images=("👤", "🤖")
         )
         msg = gr.Textbox(
             placeholder=TRANSLATIONS['en']['description'],
