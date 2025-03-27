@@ -177,6 +177,7 @@ def create_interface():
         gap: 0.5em !important;
         justify-content: flex-end !important;
         background-color: var(--bg-dark) !important;
+        border: none !important;
     }
     """
     
