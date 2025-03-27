@@ -18,7 +18,7 @@ TRANSLATIONS = {
         "error": "抱歉，处理您的请求时出现错误: {}",
         "examples": [
             "How many domains do we have?",
-           "我们一共有多少个domain",
+           "172.16.97.128是什么server",
             "In dev1, how many servers are running the configportal service?",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "dev1里面有多少个server运行Logserver服务，请列出ip",
@@ -39,7 +39,7 @@ TRANSLATIONS = {
         "error": "Sorry, an error occurred: {}",
         "examples": [
             "How many domains do we have?",
-           "我们一共有多少个domain",
+           "172.16.97.128是什么server",
             "In dev1, how many servers are running the configportal service?",
             "在dev1 domain中，一共有多少个server正在运行configportal service",
             "dev1里面有多少个server 运行Logserver服务，请列出ip",
