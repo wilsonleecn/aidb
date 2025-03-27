@@ -53,6 +53,26 @@ def encrypt_results(results: List[dict], encryptor: ValueEncryptor) -> List[dict
         encrypted_results.append(encrypted_item)
     return encrypted_results
 
+def detect_omission(text: str, language: str = "en") -> bool:
+    """
+    Detect if the summary contains any omission markers.
+    Returns True if omissions are detected, False otherwise.
+    """
+    # Common omission markers in different languages
+    omission_markers = {
+        "en": [
+            "...", "etc", "and more", "and so on", "other", "remaining",
+            "similar records", "omitted", "additional", "and others"
+        ],
+        "zh": [
+            "...", "…", "等", "等等", "其他", "其它", "省略", "余下",
+            "类似记录", "还有", "剩余", "更多"
+        ]
+    }
+    
+    markers = omission_markers.get(language, omission_markers["en"])
+    return any(marker in text.lower() for marker in markers)
+
 def summarize_sql_result(user_question: str, sqls: str, all_results: list, language: str = "en") -> str:
     """
     Calls OpenAI to produce a user-friendly summary of multiple SQL statements and their results.
@@ -95,9 +115,13 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
         temperature=0.7,
         max_tokens=400)
 
-    # Extract the assistant's answer and decrypt the values
-    summary_text = response.choices[0].message.content.strip()
+    # Extract the assistant's answer and check for truncation
+    completion = response.choices[0]
+    summary_text = completion.message.content.strip()
+    was_truncated = completion.finish_reason == "length"
+    
     decrypted_summary = encryptor.decrypt_text(summary_text)
+    has_omissions = detect_omission(decrypted_summary, language)
     
     # Create a Response object with metadata
     class Response(str):
@@ -112,7 +136,9 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
         "value_map": encryptor.value_map,  # 添加 encryptor 的映射关系
         "model": "gpt-3.5-turbo",
         "temperature": 0.7,
-        "max_tokens": 400
+        "max_tokens": 400,
+        "was_truncated": was_truncated,
+        "has_omissions": has_omissions  # Add omission detection status
     }
     
     return response
