@@ -27,7 +27,7 @@ def process_question(user_question, language: str = "en"):
         # generate summary
         summary = summarize_sql_result(user_question, sqls, all_results, language)
         
-        if response.metadata["has_omissions"]:
+        if summary.metadata["has_omissions"]:
             # append query results to summary
             raw_results_section = "\n\n----Summary has omissions, show raw results----"
             for i, result in enumerate(all_results):
