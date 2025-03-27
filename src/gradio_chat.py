@@ -187,7 +187,20 @@ def create_interface():
     }
     """
     
-    with gr.Blocks(css=custom_css) as demo:
+    # Add auto-scroll JavaScript
+    js = """
+    function scrollToBottom() {
+        const chatbot = document.querySelector('#chatbot');
+        if (chatbot) {
+            const messages = chatbot.querySelector('.messages');
+            if (messages) {
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+    }
+    """
+    
+    with gr.Blocks(css=custom_css, js=js) as demo:
         with gr.Row():
             with gr.Column(scale=4):
                 title = gr.Markdown(f"# {TRANSLATIONS['en']['title']}")
@@ -233,14 +246,16 @@ def create_interface():
             bot.process_query,
             inputs=[msg, state],
             outputs=[chatbot, msg, state],
-            show_progress=True
+            show_progress=True,
+            _js="scrollToBottom"  # Add auto-scroll after response
         )
 
         msg.submit(
             bot.process_query,
             inputs=[msg, state],
             outputs=[chatbot, msg, state],
-            show_progress=True
+            show_progress=True,
+            _js="scrollToBottom"  # Add auto-scroll after response
         )
 
         clear.click(lambda: ([], "", []), outputs=[chatbot, msg, state])
