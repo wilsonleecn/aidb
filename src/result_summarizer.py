@@ -72,9 +72,18 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
 
     # Prepare the system message based on language
     if language == "zh":
-        system_msg = "你是一个人工智能，可以生成多个 SQL 语句的简洁、用户友好的摘要及其相应的结果。用清晰、自然的语言直接回答用户的问题。如果结果是一个长列表，请不要做任何修剪和省略。 "
+        system_msg = """你是一个人工智能，可以生成多个 SQL 语句的简洁、用户友好的摘要及其相应的结果。请注意：
+1. 使用清晰自然的语言直接回答用户问题
+2. 必须完整展示所有结果，不允许对任何列表进行截断或省略
+3. 即使结果很长，也要完整展示每一项
+4. 禁止使用"等"、"..."或类似的省略表示"""
     else:
-        system_msg = "You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Address the user's question directly in clear, natural language. If the result is a long list, do not do any trimming or omitting. "
+        system_msg = """You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Important instructions:
+1. Answer the user's question in clear, natural language
+2. You MUST show ALL results in their entirety
+3. NEVER truncate or omit any items from lists, no matter how long they are
+4. DO NOT use "etc.", "..." or any form of abbreviation
+5. Include every single item in the results"""
         
     # Prepare messages for OpenAI
     messages = [
