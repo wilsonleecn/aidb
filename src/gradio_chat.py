@@ -167,23 +167,19 @@ def create_interface():
         margin: 0 !important;
     }
     .language-selector .gr-form > div:first-child,
-    .language-selector .gr-form > div.wrap,
-    .language-selector .gr-block.gr-box,
-    .language-selector > div:first-child {
-        display: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
+    .language-selector .gr-form > div.wrap {
         border: none !important;
         background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     .language-selector .gr-radio-row > div {
         margin: 0 !important;
     }
-    /* Remove outer container div */
-    .language-selector > .gr-block {
+    .language-selector .gr-block.gr-box {
         border: none !important;
-        box-shadow: none !important;
         background: none !important;
+        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
     }
