@@ -154,6 +154,10 @@ def create_interface():
     .language-selector {
         text-align: right;
     }
+    /* Target the form div */
+    .language-selector .form.svelte-sfqy0y {
+        border: none !important;
+    }
     /* Target the fieldset directly and remove its styling */
     .language-selector fieldset,
     .language-selector .block.svelte-12cmxck {
