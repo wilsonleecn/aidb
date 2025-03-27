@@ -138,7 +138,29 @@ def create_interface():
     """Create and configure the Gradio interface"""
     bot = SQLChatBot()
     
-    with gr.Blocks(css="#chatbot {height: 600px} .message { font-size: 15px }") as demo:
+    # Add custom CSS for dark mode
+    custom_css = """
+    #chatbot {height: 600px} 
+    .message {font-size: 15px}
+    
+    /* Dark mode styles */
+    body {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+    }
+    .gradio-container {
+        background-color: #000000 !important;
+    }
+    .chat-message {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+    .chat-message.user {
+        background-color: #2a2a2a !important;
+    }
+    """
+    
+    with gr.Blocks(css=custom_css) as demo:
         # Language selection
         with gr.Row():
             language_radio = gr.Radio(
