@@ -175,6 +175,9 @@ def create_interface():
     .language-selector .wrap.svelte-1kzox3m {
         display: flex !important;
         gap: 0.5em !important;
+        background: none !important;
+        background-color: transparent !important;
+        justify-content: flex-end !important;
     }
     """
     
