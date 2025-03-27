@@ -153,6 +153,7 @@ def create_interface():
     /* Language selector styles */
     .language-selector {
         text-align: right;
+        min-width: 180px !important;
     }
     /* Target the form div */
     .language-selector .form.svelte-sfqy0y {
