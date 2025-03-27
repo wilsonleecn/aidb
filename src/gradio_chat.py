@@ -26,7 +26,8 @@ TRANSLATIONS = {
         ],
         "sql_section": "执行的SQL语句：",
         "result_section": "查询结果：",
-        "summary_section": "结果说明："
+        "summary_section": "结果说明：",
+        "placeholder": "在这里输入你的问题..."
     },
     "en": {
         "title": "DevOoops Assistant",
@@ -46,7 +47,8 @@ TRANSLATIONS = {
         ],
         "sql_section": "Executed SQL:",
         "result_section": "Query Results:",
-        "summary_section": "Summary:"
+        "summary_section": "Summary:",
+        "placeholder": "Type your question here..."
     }
 }
 
@@ -61,16 +63,6 @@ class SQLChatBot:
         self.current_lang = "zh" if lang == "中文" else "en"
         return TRANSLATIONS[self.current_lang]
     
-    # def format_response(self, response: Dict[str, Any]) -> str:
-    #     """Format the response message with proper sections and formatting"""
-    #     trans = TRANSLATIONS[self.current_lang]
-        
-    #     formatted_msg = f"**{trans['sql_section']}**\n```sql\n{response['sql']}\n```\n\n"
-    #     formatted_msg += f"**{trans['result_section']}**\n```json\n{json.dumps(response['result'], indent=2, ensure_ascii=False)}\n```\n\n"
-    #     formatted_msg += f"**{trans['summary_section']}**\n{response['summary']}"
-        
-    #     return formatted_msg
-
     def process_query(self, message: str, history: list) -> tuple:
         """Process user query and return formatted response"""
         try:
@@ -138,7 +130,7 @@ def create_interface():
     """Create and configure the Gradio interface"""
     bot = SQLChatBot()
     
-    # Add custom CSS for dark mode
+    # Add custom CSS for dark mode and layout
     custom_css = """
     #chatbot {height: 600px} 
     .message {font-size: 15px}
@@ -158,20 +150,24 @@ def create_interface():
     .chat-message.user {
         background-color: #2a2a2a !important;
     }
+    /* Add styles for language selector */
+    .language-selector {
+        text-align: right;
+    }
     """
     
     with gr.Blocks(css=custom_css) as demo:
-        # Language selection
         with gr.Row():
-            language_radio = gr.Radio(
-                choices=["English", "中文"],
-                value="English",
-                label="Language",
-                interactive=True
-            )
+            with gr.Column(scale=4):
+                title = gr.Markdown(f"# {TRANSLATIONS['en']['title']}")
+            with gr.Column(scale=1, elem_classes="language-selector"):
+                language_radio = gr.Radio(
+                    choices=["English", "中文"],
+                    value="English",
+                    label="Language",
+                    interactive=True
+                )
         
-        # Title and description
-        title = gr.Markdown(f"# {TRANSLATIONS['en']['title']}")
         description = gr.Markdown(TRANSLATIONS['en']['description'])
         
         # Chat interface
@@ -184,7 +180,7 @@ def create_interface():
         )
 
         msg = gr.Textbox(
-            placeholder=TRANSLATIONS['en']['description'],
+            placeholder=TRANSLATIONS['en']['placeholder'],
             show_label=False
         )
         
@@ -226,7 +222,7 @@ def create_interface():
                 f"# {trans['title']}",
                 trans['description'],
                 trans['clear_btn'],
-                trans['description']  # Update textbox placeholder
+                trans['placeholder']
             )
         
         # Remove examples from outputs
@@ -237,7 +233,7 @@ def create_interface():
                 title,
                 description,
                 clear,
-                msg  # Update textbox placeholder
+                msg
             ]
         )
     
