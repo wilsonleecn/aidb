@@ -155,13 +155,14 @@ def create_interface():
         text-align: right;
     }
     /* Target the fieldset directly and remove its styling */
-    .language-selector fieldset {
-        border: none !important;
+    .language-selector fieldset,
+    .language-selector .block.svelte-12cmxck {
+        border-color: transparent !important;
+        background: transparent !important;
         padding: 0 !important;
         margin: 0 !important;
         min-width: unset !important;
         overflow: visible !important;
-        background: none !important;
     }
     /* Hide the absolute positioned wrap */
     .language-selector fieldset > .wrap.default {
