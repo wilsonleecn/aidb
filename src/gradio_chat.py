@@ -182,7 +182,7 @@ def create_interface():
         display: flex !important;
         gap: 0.5em !important;
         justify-content: flex-end !important;
-        background-color: var(--bg-dark) !important;
+        # background-color: var(--bg-dark) !important;
         border: none !important;
     }
     """
