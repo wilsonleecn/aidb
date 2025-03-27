@@ -208,7 +208,7 @@ def create_interface():
                 "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f464.svg",  # 用户头像 👤
                 "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f916.svg"   # 机器人头像 🤖
             ),
-            auto_scroll=True  # 添加自动滚动
+            autoscroll=True  # 添加自动滚动
         )
 
         msg = gr.Textbox(
