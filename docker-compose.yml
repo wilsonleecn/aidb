@@ -15,7 +15,7 @@ services:
     # Mount our init scripts
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
-      - /data/db:/var/lib/mysql
+      - /data/aidb:/var/lib/mysql
 
   aidb:
     image: aidb:latest
