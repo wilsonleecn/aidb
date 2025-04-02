@@ -10,12 +10,14 @@ services:
       - MARIADB_USER=dbuser
       - MARIADB_PASSWORD=db3213
     # Expose the MySQL port.
-    expose:
-      - "3306"
+    # expose:
+    #   - "3306"
+    ports:
+      - "3306:3306"
     # Mount our init scripts
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
-      - /data/aiddb:/var/lib/mysql
+      - /data/aidb:/var/lib/mysql
 
   aidb:
     image: aidb:latest
@@ -27,6 +29,6 @@ services:
     volumes:
       - ./src:/home/work/aidb
     ports:
-      - "5000:5000"
+      - "80:5000"
     # command: python web_server.py
     command: python gradio_chat.py
