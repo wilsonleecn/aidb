@@ -59,4 +59,63 @@ resourcealias:
   # servergroup:
 
   # service:
-
+  - resource_type: "service"
+    name: "fortiloginmgr"
+    alias:
+      - "loginmgr"
+      - "loginmanager"
+      - "login manager"
+      - "login server"
+  - resource_type: "service"
+    name: "cfgserver"
+    alias:
+      - "config server"
+  - resource_type: "service"
+    name: "cfgtunnel"
+    alias:
+      - "config tunnel"
+  - resource_type: "service"
+    name: "fortideploy"
+    alias:
+      - "deploy server"
+  - resource_type: "service"
+    name: "kmsserver"
+    alias:
+      - "kms server"
+      - "kms"
+  - resource_type: "service"
+    name: "fortideploy_api"
+    alias:
+      - "api server"
+      - "fortideploy api"
+      - "deploy api"
+  - resource_type: "service"
+    name: "fortideploy_gateway"
+    alias:
+      - "gateway server"
+      - "deploy gateway"
+      - "deploy gateway server"
+  - resource_type: "service"
+    name: "fortiztp_admin"
+    alias:
+      - "ztp admin"
+      - "fortiztp admin"
+  - resource_type: "service"
+    name: "fortiztp_portal"
+    alias:
+      - "ztp portal"
+      - "fortiztp portal"
+  - resource_type: "service"
+    name: "deploystatusmgr"
+    alias:
+      - "deploy status manager"
+  - resource_type: "service"
+    name: "fortielcs_portal"
+    alias:
+      - "forticareelite portal"
+      - "careelite portal"
+  - resource_type: "service"
+    name: "fortielcs_admin"
+    alias:
+      - "forticareelite admin"
+      - "careelite admin"
