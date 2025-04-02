@@ -23,7 +23,7 @@ class ValueEncryptor:
         # Take first 6 characters of hex digest
         hash_str = hash_obj.hexdigest()[:6]
         # Create a placeholder with a clear format and double quotes
-        placeholder = f'"VAL_{hash_str}"'
+        placeholder = f'VAL_{hash_str}'
         # Store the mapping if it's a new value
         if placeholder not in self.value_map:
             self.value_map[placeholder] = value
