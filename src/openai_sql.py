@@ -90,6 +90,7 @@ When querying server information, always include:
 - The domain name
 
 For server queries, use appropriate JOINs between ServerHost, ServerHostGroup, and Domain tables.
+Normally the hostname in the user's question means serverGroup name or service name running on this server.
 """
 
 def generate_statements_from_question(user_question: str) -> list:
