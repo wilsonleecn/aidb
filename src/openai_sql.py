@@ -20,13 +20,13 @@ Here is the database schema we have:
 
 CREATE TABLE Domain (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+    name VARCHAR(255) NOT NULL UNIQUE COMMENT 'domain name or region name'
 );
 
 CREATE TABLE ServerHostGroup (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id BIGINT UNSIGNED NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL COMMENT 'server host group name or server group name',
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE
 ) COMMENT = 'Use ServerGroupMapping table to map to reated ServerGroup item';
 
@@ -34,7 +34,7 @@ CREATE TABLE ServerHost (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id BIGINT UNSIGNED NOT NULL,
     hostname VARCHAR(255) NOT NULL,
-    server_host_group_id BIGINT UNSIGNED NOT NULL,
+    server_host_group_id BIGINT UNSIGNED NOT NULL COMMENT 'mapped to ServerHostGroup.id',
     ip_address VARCHAR(255),
     os VARCHAR(255),
     location VARCHAR(255),
@@ -47,7 +47,7 @@ CREATE TABLE Service (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL UNIQUE,
-    service_type VARCHAR(255),
+    service_type VARCHAR(255) COMMENT 'Service name',
     docker BOOLEAN,
     service_package_name VARCHAR(255),
     service_config_file TEXT,
@@ -60,7 +60,7 @@ CREATE TABLE Service (
 CREATE TABLE ServerGroup (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id BIGINT UNSIGNED NOT NULL,
-    name VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL UNIQUE COMMENT 'server group name',
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE
 ) COMMENT = 'Use ServerGroupMapping table to map to reated ServerHostGroup item';
 
@@ -69,7 +69,7 @@ CREATE TABLE ServerGroupMapping (
     domain_id BIGINT UNSIGNED NOT NULL,
     server_group_id BIGINT UNSIGNED NOT NULL COMMENT 'mapped to ServerGroup table id column',
     server_host_group_id BIGINT UNSIGNED NOT NULL COMMENT 'mapped to ServerHostGroup table id column',
-    service_id BIGINT UNSIGNED NOT NULL,
+    service_id BIGINT UNSIGNED NOT NULL 'mapped to Service table id column',
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE,
     FOREIGN KEY (server_group_id) REFERENCES ServerGroup(id) ON DELETE CASCADE,
     FOREIGN KEY (server_host_group_id) REFERENCES ServerHostGroup(id) ON DELETE CASCADE,
