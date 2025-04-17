@@ -92,9 +92,9 @@ def summarize_sql_result(user_question: str, sqls: str, all_results: list, langu
 
     # Prepare the system message based on language
     if language == "zh":
-        system_msg = "你是一个人工智能，可以生成多个 SQL 语句的简洁、用户友好的摘要及其相应的结果。用清晰、自然的语言直接回答用户的问题。"
+        system_msg = "你是一个人工智能，可以生成多个 SQL 语句的简洁、用户友好的摘要及其相应的结果。用清晰、自然的语言直接回答用户的问题。显示所有result数组数据"
     else:
-        system_msg = "You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Address the user's question directly in clear, natural language. "
+        system_msg = "You are an AI that produces a concise, user-friendly summary of multiple SQL statements and their corresponding results. Address the user's question directly in clear, natural language. show all result array items. "
         
     # Prepare messages for OpenAI
     messages = [
