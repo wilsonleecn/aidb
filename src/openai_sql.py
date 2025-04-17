@@ -28,7 +28,7 @@ CREATE TABLE ServerHostGroup (
     domain_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL,
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE
-);
+) COMMENT = 'Use ServerGroupMapping table to map to reated ServerGroup item';
 
 CREATE TABLE ServerHost (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -62,13 +62,13 @@ CREATE TABLE ServerGroup (
     domain_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL UNIQUE,
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE
-);
+) COMMENT = 'Use ServerGroupMapping table to map to reated ServerHostGroup item';
 
 CREATE TABLE ServerGroupMapping (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id BIGINT UNSIGNED NOT NULL,
-    server_group_id BIGINT UNSIGNED NOT NULL,
-    server_host_group_id BIGINT UNSIGNED NOT NULL,
+    server_group_id BIGINT UNSIGNED NOT NULL COMMENT 'mapped to ServerGroup table id column',
+    server_host_group_id BIGINT UNSIGNED NOT NULL COMMENT 'mapped to ServerHostGroup table id column',
     service_id BIGINT UNSIGNED NOT NULL,
     FOREIGN KEY (domain_id) REFERENCES Domain(id) ON DELETE CASCADE,
     FOREIGN KEY (server_group_id) REFERENCES ServerGroup(id) ON DELETE CASCADE,
